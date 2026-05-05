@@ -125,6 +125,9 @@
         body.tv-mode .header h1 { font-size: 2.2rem; }
         body.tv-mode .container { max-width: 1200px; }
 
+        .location-link { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .location-link:hover { color: var(--green-accent); }
+
         @media (max-width: 480px) {
             .header h1 { font-size: 1.2rem; }
             .standings-table th, .standings-table td { padding: 8px 4px; font-size: 0.8rem; }
@@ -139,10 +142,12 @@
         <h1 id="tournament-name">⚾ Shamrock Classic</h1>
         <span class="acp-badge">2026</span>
     </div>
+    
     <div class="header-sub" id="tournament-sub">
         <span class="live-dot"></span>
-        Shamrock Park, Pincourt &nbsp;-&nbsp; May 28–31
+        <a href="https://share.google/gTjwyYNfEEVWSNG3l" target="_blank" class="location-link">📍 Shamrock Park, Pincourt</a> &nbsp;-&nbsp; May 28–31
     </div>
+
     <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab('standings')" id="tab-standings">🏆 Standings</button>
         <button class="tab-btn" onclick="switchTab('schedule')" id="tab-schedule">📅 Schedule</button>
@@ -160,7 +165,7 @@
             <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Bubble</div>
             <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Eliminated</div>
         </div>
-        <div class="section-title">Pool Standings</div>
+        <div class="section-title">Standings</div>
         <table class="standings-table">
             <thead>
                 <tr>
@@ -227,6 +232,7 @@
                     </div>
                     <button class="btn btn-gold" id="save-btn" onclick="saveScore()">💾 Save Score</button>
                     <div class="success-toast" id="save-toast">✅ Score saved! Standings updated.</div>
+                    <div id="admin-error" style="display:none; color:var(--red); font-size:0.8rem; font-weight:800; text-align:center; margin-top:8px; padding:10px; background:rgba(248,113,113,0.1); border-radius:8px; border:1px solid var(--red);"></div>
                 </div>
             </div>
             <div class="admin-card">
@@ -296,12 +302,16 @@
     }
 
     function updateHeader() {
-        if (state.settings.TournamentName) {
-            document.getElementById('tournament-name').textContent = '⚾ ' + state.settings.TournamentName;
+    if (state.settings.TournamentName) {
+        document.getElementById('tournament-name').textContent = '⚾ ' + state.settings.TournamentName;
         }
-        if (state.settings.Location && state.settings.Dates) {
-            document.getElementById('tournament-sub').innerHTML =
-                `<span class="live-dot"></span>${state.settings.Location} &nbsp;-&nbsp; ${state.settings.Dates}`;
+    if (state.settings.Location && state.settings.Dates) {
+        const mapsURL = state.settings.MapsURL || null;
+        const locationHTML = mapsURL
+            ? `<a href="${mapsURL}" target="_blank" class="location-link">📍 ${state.settings.Location}</a>`
+            : `📍 ${state.settings.Location}`;
+        document.getElementById('tournament-sub').innerHTML =
+            `<span class="live-dot"></span>${locationHTML} &nbsp;-&nbsp; ${state.settings.Dates}`;
         }
     }
 
@@ -433,12 +443,15 @@
 
     function populateGameSelect() {
         const sel = document.getElementById('game-select');
+        const currentVal = sel.value; // 🔑 Remember what was selected
         sel.innerHTML = '<option value="">— Choose a game —</option>';
         state.games.forEach(g => {
             const label = g.label || `${getTeamName(g.away)} vs ${getTeamName(g.home)}`;
             sel.innerHTML += `<option value="${g.id}">${g.day} ${g.time} — ${label}</option>`;
         });
+        if (currentVal) sel.value = currentVal; // 🔑 Restore it
     }
+
 
     function onGameSelect() {
         const id   = parseInt(document.getElementById('game-select').value);
@@ -460,11 +473,24 @@
         document.getElementById('btn-final').className     = 'status-btn' + (selectedStatus === 'Final'     ? ' active-final'     : '');
         document.getElementById('btn-postponed').className = 'status-btn' + (selectedStatus === 'Postponed' ? ' active-postponed' : '');
     }
+    function showAdminError(msg) {
+        const err = document.getElementById('admin-error');
+        err.textContent = msg;
+        err.style.display = 'block';
+        setTimeout(() => { err.style.display = 'none'; }, 3500);
+    }
 
     async function saveScore() {
-        const id   = parseInt(document.getElementById('game-select').value);
+        const id = parseInt(document.getElementById('game-select').value);
+        if (!id) {
+            showAdminError('⚠️ No game selected — please choose a game from the dropdown before saving.');
+            return;
+        }
         const game = state.games.find(g => g.id === id);
-        if (!game) return;
+        if (!game) {
+            showAdminError('⚠️ Game not found. Try refreshing the page.');
+            return;
+        }
 
         const homeScore = parseInt(document.getElementById('home-score-input').value) || 0;
         const awayScore = parseInt(document.getElementById('away-score-input').value) || 0;
