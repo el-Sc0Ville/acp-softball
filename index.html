@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ACP Shamrock Classic ⚾</title>
+    <style>
+        :root {
+            --green-dark: #0d1f0d;
+            --green-card: #1a2e1a;
+            --green-border: #2d5a2d;
+            --green-accent: #4ade80;
+            --gold: #fbbf24;
+            --gold-dark: #d97706;
+            --red: #f87171;
+            --text-main: #f0fdf4;
+            --text-muted: #86efac;
+            --text-dim: #6b7280;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--green-dark); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+        .header { background: linear-gradient(135deg, #0a1a0a 0%, #1a3a1a 100%); border-bottom: 3px solid var(--green-accent); padding: 16px 20px 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .header-top { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
+        .acp-badge { background: var(--gold); color: #1a1a00; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; }
+        .header h1 { font-size: 1.4rem; font-weight: 900; color: var(--text-main); text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+        .header-sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px; font-weight: 600; }
+
+        .live-dot { display: inline-block; width: 8px; height: 8px; background: var(--green-accent); border-radius: 50%; margin-right: 5px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+
+        .tab-nav { display: flex; background: rgba(0,0,0,0.3); border-radius: 8px 8px 0 0; overflow: hidden; }
+        .tab-btn { flex: 1; background: transparent; border: none; padding: 12px 8px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .tab-btn.active { color: var(--green-accent); border-bottom-color: var(--green-accent); background: rgba(74,222,128,0.08); }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 16px 12px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--green-border); }
+
+        .standings-table { width: 100%; border-collapse: collapse; background: var(--green-card); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 20px; }
+        .standings-table thead tr { background: rgba(74,222,128,0.1); border-bottom: 2px solid var(--green-border); }
+        .standings-table th { padding: 10px 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: center; }
+        .standings-table th:nth-child(2) { text-align: left; }
+        .standings-table td { padding: 12px 8px; font-size: 0.9rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .standings-table td:nth-child(2) { text-align: left; }
+        .standings-table tbody tr:last-child td { border-bottom: none; }
+        .standings-table tbody tr:hover { background: rgba(74,222,128,0.05); }
+        .standings-table tbody tr.playoff-spot { border-left: 4px solid var(--green-accent); }
+        .standings-table tbody tr.bubble-spot { border-left: 4px solid var(--gold); }
+        .standings-table tbody tr.eliminated { border-left: 4px solid var(--red); opacity: 0.6; }
+
+        .rank-num { font-weight: 900; font-size: 1rem; color: var(--text-dim); }
+        .rank-1 .rank-num { color: var(--gold); }
+        .rank-2 .rank-num { color: #94a3b8; }
+        .rank-3 .rank-num { color: #cd7f32; }
+        .team-name-cell { font-weight: 700; font-size: 0.95rem; }
+        .pts-cell { font-weight: 900; font-size: 1.1rem; color: var(--green-accent); }
+        .diff-positive { color: var(--green-accent); font-weight: 700; }
+        .diff-negative { color: var(--red); font-weight: 700; }
+        .diff-zero { color: var(--text-dim); }
+
+        .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+        .day-group { margin-bottom: 24px; }
+        .day-header { background: linear-gradient(135deg, var(--green-card), rgba(74,222,128,0.1)); border: 1px solid var(--green-border); border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .game-card { background: var(--green-card); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid var(--green-border); display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+        .game-card:hover { border-color: var(--green-accent); }
+        .game-time { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); min-width: 55px; text-align: center; }
+        .game-teams { flex: 1; }
+        .game-matchup { font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .team-a { flex: 1; text-align: right; }
+        .team-b { flex: 1; text-align: left; }
+        .vs-badge { font-size: 0.65rem; color: var(--text-dim); font-weight: 800; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
+        .game-score { font-size: 1.1rem; font-weight: 900; min-width: 60px; text-align: center; }
+        .game-status { font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; min-width: 65px; text-align: center; }
+        .status-final { background: rgba(74,222,128,0.15); color: var(--green-accent); border: 1px solid rgba(74,222,128,0.3); }
+        .status-live { background: rgba(251,191,36,0.15); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); animation: pulse 1.5s infinite; }
+        .status-upcoming { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); }
+        .status-postponed { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+        .winner-bold { font-weight: 900; color: var(--green-accent); }
+
+        .admin-card { background: var(--green-card); border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--green-border); }
+        .admin-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 16px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+        .pin-screen { text-align: center; padding: 20px; }
+        .pin-screen p { color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem; }
+        .pin-input { background: rgba(255,255,255,0.08); border: 2px solid var(--green-border); border-radius: 10px; color: var(--text-main); font-size: 1.5rem; font-weight: 900; text-align: center; padding: 12px; width: 160px; letter-spacing: 8px; outline: none; transition: border-color 0.2s; }
+        .pin-input:focus { border-color: var(--green-accent); }
+
+        .btn { background: var(--green-accent); color: #0d1f0d; border: none; border-radius: 10px; padding: 12px 24px; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 10px; }
+        .btn:hover { background: #22c55e; transform: translateY(-1px); }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-gold { background: var(--gold); color: #1a1a00; }
+        .btn-gold:hover { background: #f59e0b; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; }
+        .form-select, .form-input { width: 100%; background: rgba(255,255,255,0.06); border: 2px solid var(--green-border); border-radius: 8px; color: var(--text-main); font-size: 0.95rem; font-weight: 600; padding: 10px 12px; outline: none; transition: border-color 0.2s; appearance: none; }
+        .form-select:focus, .form-input:focus { border-color: var(--green-accent); }
+        .score-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
+        .score-vs { font-size: 0.8rem; font-weight: 900; color: var(--text-dim); text-align: center; }
+        .score-input { text-align: center; font-size: 1.5rem; font-weight: 900; padding: 10px; }
+        .team-label-score { font-size: 0.75rem; font-weight: 800; text-align: center; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+        .status-toggle { display: flex; gap: 8px; margin-top: 4px; }
+        .status-btn { flex: 1; background: rgba(255,255,255,0.05); border: 2px solid var(--green-border); border-radius: 8px; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; padding: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+        .status-btn.active-final { background: rgba(74,222,128,0.15); border-color: var(--green-accent); color: var(--green-accent); }
+        .status-btn.active-live { background: rgba(251,191,36,0.15); border-color: var(--gold); color: var(--gold); }
+        .status-btn.active-postponed { background: rgba(248,113,113,0.15); border-color: var(--red); color: var(--red); }
+
+        .success-toast { display: none; background: rgba(74,222,128,0.15); border: 1px solid var(--green-accent); border-radius: 8px; padding: 12px; text-align: center; color: var(--green-accent); font-weight: 800; margin-top: 10px; }
+        .refresh-bar { text-align: center; font-size: 0.7rem; color: var(--text-dim); padding: 8px; margin-top: 8px; }
+        .tv-mode-btn { background: rgba(255,255,255,0.06); border: 1px solid var(--green-border); border-radius: 8px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 12px; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+        .tv-mode-btn:hover { border-color: var(--green-accent); color: var(--green-accent); }
+
+        body.tv-mode .standings-table th { font-size: 0.9rem; padding: 16px 12px; }
+        body.tv-mode .standings-table td { font-size: 1.3rem; padding: 18px 12px; }
+        body.tv-mode .team-name-cell { font-size: 1.4rem; }
+        body.tv-mode .pts-cell { font-size: 1.6rem; }
+        body.tv-mode .header h1 { font-size: 2.2rem; }
+        body.tv-mode .container { max-width: 1200px; }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.2rem; }
+            .standings-table th, .standings-table td { padding: 8px 4px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-top">
+        <span class="acp-badge">ACP</span>
+        <h1 id="tournament-name">⚾ Shamrock Classic</h1>
+        <span class="acp-badge">2025</span>
+    </div>
+    <div class="header-sub" id="tournament-sub">
+        <span class="live-dot"></span>
+        Shamrock Park, Pincourt &nbsp;-&nbsp; May 28–31
+    </div>
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('standings')" id="tab-standings">🏆 Standings</button>
+        <button class="tab-btn" onclick="switchTab('schedule')" id="tab-schedule">📅 Schedule</button>
+        <button class="tab-btn" onclick="switchTab('admin')" id="tab-admin">🔑 Admin</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- STANDINGS -->
+    <div id="standings-content" class="tab-content active">
+        <button class="tv-mode-btn" onclick="toggleTVMode()">📺 Toggle TV Mode</button>
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green-accent)"></div> Playoff Spot</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Bubble</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Eliminated</div>
+        </div>
+        <div class="section-title">Pool Standings</div>
+        <table class="standings-table">
+            <thead>
+                <tr>
+                    <th>#</th><th>Team</th><th>GP</th><th>W</th><th>L</th>
+                    <th>T</th><th>RF</th><th>RA</th><th>Diff</th><th>Pts</th>
+                </tr>
+            </thead>
+            <tbody id="standings-body">
+                <tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-dim);">Loading standings... ⚾</td></tr>
+            </tbody>
+        </table>
+        <div class="refresh-bar" id="standings-refresh">—</div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="schedule-content" class="tab-content">
+        <div id="schedule-body">
+            <div style="text-align:center;padding:30px;color:var(--text-dim);">Loading schedule... 📅</div>
+        </div>
+        <div class="refresh-bar" id="schedule-refresh">—</div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="admin-content" class="tab-content">
+        <div id="pin-screen" class="admin-card">
+            <div class="pin-screen">
+                <h3 style="justify-content:center;margin-bottom:8px;">🔐 Admin Access</h3>
+                <p>Enter the admin PIN to update scores</p>
+                <input type="password" class="pin-input" id="pin-input" maxlength="4" placeholder="----" oninput="checkPin(this.value)">
+                <div id="pin-error" style="color:var(--red);font-size:0.8rem;margin-top:8px;display:none;">❌ Incorrect PIN. Try again.</div>
+            </div>
+        </div>
+
+        <div id="admin-panel" style="display:none;">
+            <div class="admin-card">
+                <h3>⚾ Update Game Score</h3>
+                <div class="form-group">
+                    <label class="form-label">Select Game</label>
+                    <select class="form-select" id="game-select" onchange="onGameSelect()">
+                        <option value="">— Choose a game —</option>
+                    </select>
+                </div>
+                <div id="score-entry" style="display:none;">
+                    <div class="form-group">
+                        <div class="score-row">
+                            <div>
+                                <div class="team-label-score" id="away-team-label">Away</div>
+                                <input type="number" class="form-input score-input" id="away-score-input" min="0" max="99" placeholder="0">
+                            </div>
+                            <div class="score-vs">–</div>
+                            <div>
+                                <div class="team-label-score" id="home-team-label">Home</div>
+                                <input type="number" class="form-input score-input" id="home-score-input" min="0" max="99" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Game Status</label>
+                        <div class="status-toggle">
+                            <button class="status-btn" id="btn-live" onclick="setStatus('Live')">🟡 Live</button>
+                            <button class="status-btn active-final" id="btn-final" onclick="setStatus('Final')">✅ Final</button>
+                            <button class="status-btn" id="btn-postponed" onclick="setStatus('Postponed')">⏸ Postponed</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-gold" id="save-btn" onclick="saveScore()">💾 Save Score</button>
+                    <div class="success-toast" id="save-toast">✅ Score saved! Standings updated.</div>
+                </div>
+            </div>
+            <div class="admin-card">
+                <h3>⚙️ Quick Actions</h3>
+                <button class="btn" onclick="lockoutAdmin()" style="background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid var(--green-border);">🔒 Lock Admin</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ⬇️ PASTE YOUR GOOGLE APPS SCRIPT URL HERE ⬇️
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxj7yt3dKSQkB4QYGGPacD9M6ACHPmj9qtD2Shkbiu-18QMjdx7HevT85d9zGz6p2mX/exec';
+
+    let state = { teams: [], games: [], settings: {}, adminUnlocked: false };
+    let selectedStatus = 'Final';
+    let adminPIN = '1234'; // fallback — overridden by Settings sheet
+
+    // ==================== DATA ====================
+
+    async function loadState() {
+        try {
+            const res  = await fetch(scriptURL);
+            const data = await res.json();
+            state.teams    = data.teams    || [];
+            state.games    = data.games    || [];
+            state.settings = data.settings || {};
+            if (state.settings.AdminPIN) adminPIN = state.settings.AdminPIN;
+            updateHeader();
+            render();
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('standings-refresh').innerHTML = `<span class="live-dot"></span> Last updated: ${timeStr}`;
+            document.getElementById('schedule-refresh').innerHTML  = `<span class="live-dot"></span> Last updated: ${timeStr}`;
+        } catch(e) {
+            document.getElementById('standings-body').innerHTML =
+                '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--red);">⚠️ Connection error. Retrying...</td></tr>';
+        }
+    }
+
+    function updateHeader() {
+        if (state.settings.TournamentName) {
+            document.getElementById('tournament-name').textContent = '⚾ ' + state.settings.TournamentName;
+        }
+        if (state.settings.Location && state.settings.Dates) {
+            document.getElementById('tournament-sub').innerHTML =
+                `<span class="live-dot"></span>${state.settings.Location} &nbsp;-&nbsp; ${state.settings.Dates}`;
+        }
+    }
+
+    // ==================== STANDINGS ====================
+
+    function calcStandings() {
+        const stats = {};
+        state.teams.forEach(t => {
+            stats[t.id] = { id: t.id, name: t.name, gp: 0, w: 0, l: 0, tie: 0, rf: 0, ra: 0, pts: 0 };
+        });
+        state.games.forEach(g => {
+            if (g.status !== 'Final') return;
+            if (!g.home || !g.away || g.home === 0 || g.away === 0) return;
+            const h = stats[g.home], a = stats[g.away];
+            if (!h || !a) return;
+            h.gp++; a.gp++;
+            h.rf += g.homeScore; h.ra += g.awayScore;
+            a.rf += g.awayScore; a.ra += g.homeScore;
+            if (g.homeScore > g.awayScore)      { h.w++; h.pts += 2; a.l++; }
+            else if (g.awayScore > g.homeScore) { a.w++; a.pts += 2; h.l++; }
+            else                                { h.tie++; h.pts++; a.tie++; a.pts++; }
+        });
+        return Object.values(stats).sort((a, b) => {
+            if (b.pts !== a.pts) return b.pts - a.pts;
+            const dA = a.rf - a.ra, dB = b.rf - b.ra;
+            if (dB !== dA) return dB - dA;
+            return b.rf - a.rf;
+        });
+    }
+
+    function renderStandings() {
+        const standings     = calcStandings();
+        const playoffSpots  = parseInt(state.settings.PlayoffSpots) || 4;
+        const bubbleSpots   = playoffSpots + 2;
+        const tbody         = document.getElementById('standings-body');
+        let html = '';
+        standings.forEach((team, i) => {
+            const rank      = i + 1;
+            const diff      = team.rf - team.ra;
+            const diffClass = diff > 0 ? 'diff-positive' : diff < 0 ? 'diff-negative' : 'diff-zero';
+            const diffStr   = diff > 0 ? `+${diff}` : `${diff}`;
+            let rowClass    = rank <= playoffSpots ? 'playoff-spot' : rank <= bubbleSpots ? 'bubble-spot' : 'eliminated';
+            let rankClass   = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+            let rankDisplay = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+            html += `
+                <tr class="${rowClass} ${rankClass}">
+                    <td><span class="rank-num">${rankDisplay}</span></td>
+                    <td class="team-name-cell">${team.name}</td>
+                    <td>${team.gp}</td><td>${team.w}</td><td>${team.l}</td><td>${team.tie}</td>
+                    <td>${team.rf}</td><td>${team.ra}</td>
+                    <td class="${diffClass}">${diffStr}</td>
+                    <td class="pts-cell">${team.pts}</td>
+                </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    // ==================== SCHEDULE ====================
+
+    function getTeamName(id) {
+        if (!id || id === 0) return 'TBD';
+        const t = state.teams.find(t => t.id === id);
+        return t ? t.name : 'TBD';
+    }
+
+    function renderSchedule() {
+        const days = {};
+        state.games.forEach(g => {
+            if (!days[g.day]) days[g.day] = [];
+            days[g.day].push(g);
+        });
+        let html = '';
+        Object.keys(days).forEach(day => {
+            html += `<div class="day-group"><div class="day-header">📅 ${day}</div>`;
+            days[day].forEach(g => {
+                const homeName  = getTeamName(g.home);
+                const awayName  = getTeamName(g.away);
+                const isPlayed  = g.status === 'Final';
+                const isLive    = g.status === 'Live';
+                const homeWin   = isPlayed && g.homeScore > g.awayScore;
+                const awayWin   = isPlayed && g.awayScore > g.homeScore;
+                let statusClass = g.status === 'Final' ? 'status-final' : g.status === 'Live' ? 'status-live' : g.status === 'Postponed' ? 'status-postponed' : 'status-upcoming';
+
+                if (g.label) {
+                    html += `
+                        <div class="game-card">
+                            <div class="game-time">${g.time}</div>
+                            <div style="flex:1;font-size:0.9rem;font-weight:700;color:var(--gold);text-align:center;">${g.label}</div>
+                            <div class="game-status ${statusClass}">${g.status}</div>
+                        </div>`;
+                } else {
+                    html += `
+                        <div class="game-card">
+                            <div class="game-time">${g.time}</div>
+                            <div class="game-teams">
+                                <div class="game-matchup">
+                                    <div class="team-a ${awayWin ? 'winner-bold' : ''}">${awayName}</div>
+                                    ${(isPlayed || isLive)
+                                        ? `<div style="font-size:1rem;font-weight:900;min-width:60px;text-align:center;">${g.awayScore} – ${g.homeScore}</div>`
+                                        : `<span class="vs-badge">VS</span>`}
+                                    <div class="team-b ${homeWin ? 'winner-bold' : ''}">${homeName}</div>
+                                </div>
+                            </div>
+                            <div class="game-status ${statusClass}">${g.status}</div>
+                        </div>`;
+                }
+            });
+            html += `</div>`;
+        });
+        document.getElementById('schedule-body').innerHTML = html;
+    }
+
+    // ==================== ADMIN ====================
+
+    function checkPin(val) {
+        if (val.length === 4) {
+            if (val === adminPIN) {
+                state.adminUnlocked = true;
+                document.getElementById('pin-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                populateGameSelect();
+            } else {
+                document.getElementById('pin-error').style.display = 'block';
+                document.getElementById('pin-input').value = '';
+                setTimeout(() => { document.getElementById('pin-error').style.display = 'none'; }, 2000);
+            }
+        }
+    }
+
+    function populateGameSelect() {
+        const sel = document.getElementById('game-select');
+        sel.innerHTML = '<option value="">— Choose a game —</option>';
+        state.games.forEach(g => {
+            const label = g.label || `${getTeamName(g.away)} vs ${getTeamName(g.home)}`;
+            sel.innerHTML += `<option value="${g.id}">${g.day} ${g.time} — ${label}</option>`;
+        });
+    }
+
+    function onGameSelect() {
+        const id   = parseInt(document.getElementById('game-select').value);
+        const game = state.games.find(g => g.id === id);
+        if (!game) { document.getElementById('score-entry').style.display = 'none'; return; }
+        document.getElementById('score-entry').style.display = 'block';
+        document.getElementById('away-team-label').textContent = getTeamName(game.away);
+        document.getElementById('home-team-label').textContent = getTeamName(game.home);
+        document.getElementById('away-score-input').value = game.awayScore || '';
+        document.getElementById('home-score-input').value = game.homeScore || '';
+        selectedStatus = (game.status === 'Upcoming') ? 'Final' : game.status;
+        updateStatusBtns();
+    }
+
+    function setStatus(s) { selectedStatus = s; updateStatusBtns(); }
+
+    function updateStatusBtns() {
+        document.getElementById('btn-live').className      = 'status-btn' + (selectedStatus === 'Live'      ? ' active-live'      : '');
+        document.getElementById('btn-final').className     = 'status-btn' + (selectedStatus === 'Final'     ? ' active-final'     : '');
+        document.getElementById('btn-postponed').className = 'status-btn' + (selectedStatus === 'Postponed' ? ' active-postponed' : '');
+    }
+
+    async function saveScore() {
+        const id   = parseInt(document.getElementById('game-select').value);
+        const game = state.games.find(g => g.id === id);
+        if (!game) return;
+
+        const homeScore = parseInt(document.getElementById('home-score-input').value) || 0;
+        const awayScore = parseInt(document.getElementById('away-score-input').value) || 0;
+
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true; btn.textContent = '⏳ Saving...';
+
+        try {
+            const formData = new FormData();
+            formData.append('gameId',    id);
+            formData.append('homeScore', homeScore);
+            formData.append('awayScore', awayScore);
+            formData.append('status',    selectedStatus);
+
+            const res    = await fetch(scriptURL, { method: 'POST', body: formData });
+            const result = await res.json();
+
+            if (result.result === 'success') {
+                game.homeScore = homeScore;
+                game.awayScore = awayScore;
+                game.status    = selectedStatus;
+                render();
+                const toast = document.getElementById('save-toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
+        } catch(e) {
+            alert('❌ Save failed. Check your connection and try again.');
+        } finally {
+            btn.disabled = false; btn.textContent = '💾 Save Score';
+        }
+    }
+
+    function lockoutAdmin() {
+        state.adminUnlocked = false;
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('pin-screen').style.display  = 'block';
+        document.getElementById('pin-input').value = '';
+    }
+
+    // ==================== TABS + TV ====================
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tab + '-content').classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    function toggleTVMode() { document.body.classList.toggle('tv-mode'); }
+
+    function render() {
+        renderStandings();
+        renderSchedule();
+        if (state.adminUnlocked) populateGameSelect();
+    }
+
+    // Poll every 15 seconds for live updates
+    setInterval(loadState, 15000);
+
+    // Init
+    loadState();
+</script>
+</body>
+</html>
