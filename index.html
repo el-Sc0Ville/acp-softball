@@ -242,6 +242,33 @@
     // ⬇️ PASTE YOUR GOOGLE APPS SCRIPT URL HERE ⬇️
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxj7yt3dKSQkB4QYGGPacD9M6ACHPmj9qtD2Shkbiu-18QMjdx7HevT85d9zGz6p2mX/exec';
 
+    function getDaySuffix(n) {
+    if (n >= 11 && n <= 13) return 'th';
+    return ['th','st','nd','rd'][n % 10] || 'th';
+}
+
+    function formatDayDisplay(dayStr) {
+    // "Thursday, May 28"  →  "THU May 28th"
+    try {
+        const parts   = dayStr.replace(',', '').trim().split(/\s+/);
+        const dayName = parts[0].substring(0, 3).toUpperCase();
+        const month   = parts[1];
+        const dayNum  = parseInt(parts[2]);
+        return `${dayName} ${month} ${dayNum}${getDaySuffix(dayNum)}`;
+    } catch(e) { return dayStr; }
+}
+
+    function formatTimeDisplay(timeStr) {
+    // "6:00 PM"  →  "6PM ET"  |  "6:30 PM"  →  "6:30PM ET"
+    try {
+        const parts = timeStr.trim().split(/\s+/);
+        const h     = parseInt(parts[0].split(':')[0]);
+        const m     = parseInt(parts[0].split(':')[1]) || 0;
+        const ampm  = (parts[1] || 'PM').toUpperCase();
+        return m === 0 ? `${h}${ampm} ET` : `${h}:${String(m).padStart(2,'0')}${ampm} ET`;
+    } catch(e) { return timeStr; }
+}
+
     let state = { teams: [], games: [], settings: {}, adminUnlocked: false };
     let selectedStatus = 'Final';
     let adminPIN = '1234'; // fallback — overridden by Settings sheet
@@ -348,7 +375,7 @@
         });
         let html = '';
         Object.keys(days).forEach(day => {
-            html += `<div class="day-group"><div class="day-header">📅 ${day}</div>`;
+            html += `<div class="day-group"><div class="day-header">📅 ${formatDayDisplay(day)}</div>`;
             days[day].forEach(g => {
                 const homeName  = getTeamName(g.home);
                 const awayName  = getTeamName(g.away);
@@ -361,7 +388,7 @@
                 if (g.label) {
                     html += `
                         <div class="game-card">
-                            <div class="game-time">${g.time}</div>
+                            <div class="game-time">${formatTimeDisplay(g.time)}</div>
                             <div style="flex:1;font-size:0.9rem;font-weight:700;color:var(--gold);text-align:center;">${g.label}</div>
                             <div class="game-status ${statusClass}">${g.status}</div>
                         </div>`;
