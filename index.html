@@ -86,6 +86,8 @@
         .div-b { background:rgba(96,165,250,0.15); color:var(--blue); border:1px solid rgba(96,165,250,0.3); }
         .div-c { background:rgba(251,191,36,0.15); color:var(--gold); border:1px solid rgba(251,191,36,0.3); }
 
+        .field-badge { font-size:0.58rem; font-weight:900; padding:2px 6px; border-radius:4px; letter-spacing:0.5px; flex-shrink:0; background:rgba(255,255,255,0.07); color:var(--text-muted); border:1px solid rgba(255,255,255,0.12); }
+
         .day-group { margin-bottom:24px; }
         .day-header { background:linear-gradient(135deg,var(--green-card),rgba(74,222,128,0.1)); border:1px solid var(--green-border); border-radius:8px; padding:8px 14px; font-size:0.8rem; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
         .game-card { background:var(--green-card); border-radius:10px; padding:12px 14px; margin-bottom:8px; border:1px solid var(--green-border); display:flex; align-items:center; gap:10px; transition:all 0.2s; }
@@ -493,7 +495,7 @@
             var divBadge = liveGame.division ? '<span class="div-badge div-' + liveGame.division.toLowerCase() + '">' + liveGame.division + '</span>' : '';
             banner.className = 'next-game-banner live-banner';
             banner.style.display = 'block';
-            banner.innerHTML = '<div class="next-game-label">🔴 Live Now ' + divBadge + '</div>'
+            banner.innerHTML = '<div class="next-game-label">🔴 Live Now ' + divBadge + + fieldBadge + '</div>'
                 + '<div class="next-game-time">' + formatTimeDisplay(liveGame.time) + '</div>'
                 + '<div class="next-game-matchup">'
                 + '<span style="' + (liveGame.awayScore > liveGame.homeScore ? 'color:var(--green-accent)' : '') + '">' + getTeamName(liveGame.away) + '</span>'
@@ -504,7 +506,7 @@
             var divBadge = nextGame.division ? '<span class="div-badge div-' + nextGame.division.toLowerCase() + '">' + nextGame.division + '</span>' : '';
             banner.className = 'next-game-banner';
             banner.style.display = 'block';
-            banner.innerHTML = '<div class="next-game-label">⏭️ Up Next ' + divBadge + '</div>'
+            banner.innerHTML = '<div class="next-game-label">⏭️ Up Next ' + divBadge + + fieldBadge + '</div>'
                 + '<div class="next-game-time">' + formatDayDisplay(nextGame.day) + ' &nbsp;-&nbsp; ' + formatTimeDisplay(nextGame.time) + '</div>'
                 + '<div class="next-game-matchup">'
                 + '<span>' + getTeamName(nextGame.away) + '</span>'
@@ -621,7 +623,9 @@
                 var awayWin   = isPlayed && g.awayScore > g.homeScore;
                 var liveClass = isLive ? ' game-live' : '';
                 var sc = isPlayed ? 'status-final' : isLive ? 'status-live' : g.status === 'Postponed' ? 'status-postponed' : 'status-upcoming';
-                var divBadge = g.division ? '<span class="div-badge div-' + g.division.toLowerCase() + '">' + g.division + '</span>' : '';
+                var divBadge  = g.division ? '<span class="div-badge div-' + g.division.toLowerCase() + '">' + g.division + '</span>' : '';
+                var fieldBadge = g.field   ? '<span class="field-badge">📍 ' + g.field + '</span>' : '';
+
 
                 if (g.label) {
                     html += '<div class="game-card' + liveClass + '">'
