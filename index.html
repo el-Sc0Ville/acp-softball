@@ -703,4 +703,144 @@
                 document.getElementById('admin-panel').style.display = 'block';
                 populateGameSelect();
             } else {
-                document.
+                document.getElementById('pin-error').style.display = 'block';
+                document.getElementById('pin-input').value = '';
+                setTimeout(function() { document.getElementById('pin-error').style.display = 'none'; }, 2000);
+            }
+        }
+    }
+
+    function populateGameSelect() {
+        var sel     = document.getElementById('game-select');
+        var currVal = sel.value;
+        sel.innerHTML = '<option value="">— Choose a game —</option>';
+        state.games.forEach(function(g) {
+            var prefix = g.division ? '[Div ' + g.division + '] ' : '';
+            var label  = g.label || (getTeamName(g.away) + ' vs ' + getTeamName(g.home));
+            sel.innerHTML += '<option value="' + g.id + '">' + prefix + formatDayDisplay(g.day) + ' ' + formatTimeDisplay(g.time) + ' — ' + label + '</option>';
+        });
+        if (currVal) sel.value = currVal;
+    }
+
+    function onGameSelect() {
+        var id   = parseInt(document.getElementById('game-select').value);
+        var game = state.games.find(function(g) { return g.id === id; });
+        if (!game) { document.getElementById('score-entry').style.display = 'none'; return; }
+        document.getElementById('score-entry').style.display   = 'block';
+        document.getElementById('away-team-label').textContent = game.label ? 'Team A (Away)' : getTeamName(game.away);
+        document.getElementById('home-team-label').textContent = game.label ? 'Team B (Home)' : getTeamName(game.home);
+        document.getElementById('away-score-input').value = game.awayScore !== undefined ? game.awayScore : '';
+        document.getElementById('home-score-input').value = game.homeScore !== undefined ? game.homeScore : '';
+        selectedStatus = (game.status === 'Upcoming') ? 'Final' : game.status;
+        updateStatusBtns();
+    }
+
+    function adjustScore(team, delta) {
+        var input = document.getElementById(team + '-score-input');
+        input.value = Math.max(0, (parseInt(input.value) || 0) + delta);
+    }
+
+    function setStatus(s) { selectedStatus = s; updateStatusBtns(); }
+
+    function updateStatusBtns() {
+        document.getElementById('btn-live').className      = 'status-btn' + (selectedStatus === 'Live'      ? ' active-live'      : '');
+        document.getElementById('btn-final').className     = 'status-btn' + (selectedStatus === 'Final'     ? ' active-final'     : '');
+        document.getElementById('btn-postponed').className = 'status-btn' + (selectedStatus === 'Postponed' ? ' active-postponed' : '');
+    }
+
+    function showAdminError(msg) {
+        var err = document.getElementById('admin-error');
+        err.textContent   = msg;
+        err.style.display = 'block';
+        setTimeout(function() { err.style.display = 'none'; }, 3500);
+    }
+
+    async function saveScore() {
+        var id = parseInt(document.getElementById('game-select').value);
+        if (!id) { showAdminError('⚠️ No game selected — choose a game from the dropdown first.'); return; }
+        var game = state.games.find(function(g) { return g.id === id; });
+        if (!game) { showAdminError('⚠️ Game not found. Try refreshing the page.'); return; }
+
+        var homeScore = parseInt(document.getElementById('home-score-input').value) || 0;
+        var awayScore = parseInt(document.getElementById('away-score-input').value) || 0;
+        var btn = document.getElementById('save-btn');
+        btn.disabled = true; btn.textContent = '⏳ Saving...';
+
+        try {
+            var formData = new FormData();
+            formData.append('gameId',    id);
+            formData.append('homeScore', homeScore);
+            formData.append('awayScore', awayScore);
+            formData.append('status',    selectedStatus);
+            var res    = await fetch(scriptURL, { method:'POST', body:formData });
+            var result = await res.json();
+            if (result.result === 'success') {
+                game.homeScore = homeScore;
+                game.awayScore = awayScore;
+                game.status    = selectedStatus;
+                render();
+                var toast = document.getElementById('save-toast');
+                toast.style.display = 'block';
+                setTimeout(function() { toast.style.display = 'none'; }, 3000);
+            }
+        } catch(e) {
+            showAdminError('❌ Save failed. Check your connection and try again.');
+        } finally {
+            btn.disabled = false; btn.textContent = '💾 Save Score';
+        }
+    }
+
+    function lockoutAdmin() {
+        state.adminUnlocked = false;
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('pin-screen').style.display  = 'block';
+        document.getElementById('pin-input').value = '';
+    }
+
+    // ==================== TABS + TV ====================
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+        document.querySelectorAll('.tab-btn').forEach(function(el)     { el.classList.remove('active'); });
+        document.getElementById(tab + '-content').classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    function toggleTVMode() {
+        document.body.classList.toggle('tv-mode');
+        var isTV = document.body.classList.contains('tv-mode');
+        var btn  = document.getElementById('tv-mode-btn');
+        btn.textContent = isTV ? '📱 Exit TV Mode' : '📺 TV Mode';
+        btn.classList.toggle('tv-active', isTV);
+        if (isTV) {
+            switchTab('standings');
+            tvRotateInterval = setInterval(function() {
+                var active = document.querySelector('.tab-btn.active');
+                if (active) {
+                    var next = active.id === 'tab-standings' ? 'bracket'
+                             : active.id === 'tab-bracket'  ? 'schedule'
+                             : 'standings';
+                    switchTab(next);
+                }
+            }, 25000);
+        } else {
+            clearInterval(tvRotateInterval);
+            tvRotateInterval = null;
+        }
+    }
+
+    function render() {
+        renderStandings();
+        renderBracket();
+        renderSchedule();
+        if (state.adminUnlocked) populateGameSelect();
+    }
+
+    // Poll every 15 seconds
+    setInterval(loadState, 15000);
+
+    // Init
+    loadState();
+</script>
+</body>
+</html>
+
