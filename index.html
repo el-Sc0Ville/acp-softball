@@ -356,11 +356,12 @@
                 var el = document.getElementById(id + '-refresh');
                 if (el) el.innerHTML = bar;
             });
+            
         } catch(e) {
-            document.getElementById('standings-body-b').innerHTML =
-                '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--red);">⚠️ Connection error. Retrying...</td></tr>';
-            document.getElementById('standings-body-c').innerHTML =
-                '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--red);">⚠️ Connection error. Retrying...</td></tr>';
+            console.error('loadState error:', e);
+            var msg = '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--red);">⚠️ Error: ' + e.message + '</td></tr>';
+            document.getElementById('standings-body-b').innerHTML = msg;
+            document.getElementById('standings-body-c').innerHTML = msg;
         }
     }
 
