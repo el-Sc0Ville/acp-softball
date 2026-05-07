@@ -56,6 +56,7 @@
         .progress-bar-bg { background:rgba(255,255,255,0.06); border-radius:6px; height:6px; overflow:hidden; }
         .progress-bar-fill { background:linear-gradient(90deg,var(--green-accent),var(--gold)); height:100%; border-radius:6px; transition:width 0.6s ease; }
 
+        /* STANDINGS TABLE */
         .standings-table { width:100%; border-collapse:collapse; background:var(--green-card); border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.3); margin-bottom:24px; }
         .standings-table thead tr { background:rgba(74,222,128,0.1); border-bottom:2px solid var(--green-border); }
         .standings-table th { padding:10px 8px; font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); text-align:center; }
@@ -64,9 +65,10 @@
         .standings-table td:nth-child(2) { text-align:left; }
         .standings-table tbody tr:last-child td { border-bottom:none; }
         .standings-table tbody tr:hover { background:rgba(74,222,128,0.05); }
+        /* playoff-spot = top 4, always shown */
         .standings-table tbody tr.playoff-spot { border-left:4px solid var(--green-accent); }
-        .standings-table tbody tr.bubble-spot  { border-left:4px solid var(--gold); }
-        .standings-table tbody tr.eliminated   { border-left:4px solid var(--red); opacity:0.6; }
+        /* eliminated = only after all round-robin games done */
+        .standings-table tbody tr.eliminated { border-left:4px solid var(--red); opacity:0.65; }
         .rank-num { font-weight:900; font-size:1rem; color:var(--text-dim); }
         .rank-1 .rank-num { color:var(--gold); }
         .rank-2 .rank-num { color:#94a3b8; }
@@ -85,26 +87,39 @@
         .div-badge { font-size:0.6rem; font-weight:900; padding:2px 7px; border-radius:4px; letter-spacing:1px; flex-shrink:0; }
         .div-b { background:rgba(96,165,250,0.15); color:var(--blue); border:1px solid rgba(96,165,250,0.3); }
         .div-c { background:rgba(251,191,36,0.15); color:var(--gold); border:1px solid rgba(251,191,36,0.3); }
-        .field-badge { font-size:0.58rem; font-weight:900; padding:2px 6px; border-radius:4px; letter-spacing:0.5px; flex-shrink:0; background:rgba(255,255,255,0.07); color:var(--text-muted); border:1px solid rgba(255,255,255,0.12); }
+        .field-badge { font-size:0.58rem; font-weight:900; padding:2px 6px; border-radius:4px; letter-spacing:0.5px; flex-shrink:0; background:rgba(255,255,255,0.07); color:var(--text-muted); border:1px solid rgba(255,255,255,0.12); white-space:nowrap; }
 
+        /* ===================== SCHEDULE - REDESIGNED GAME CARD ===================== */
         .day-group { margin-bottom:24px; }
         .day-header { background:linear-gradient(135deg,var(--green-card),rgba(74,222,128,0.1)); border:1px solid var(--green-border); border-radius:8px; padding:8px 14px; font-size:0.8rem; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-        .game-card { background:var(--green-card); border-radius:10px; padding:12px 14px; margin-bottom:8px; border:1px solid var(--green-border); display:flex; align-items:center; gap:8px; transition:all 0.2s; }
+
+        /* Two-row card layout */
+        .game-card { background:var(--green-card); border-radius:10px; padding:10px 14px; margin-bottom:8px; border:1px solid var(--green-border); display:flex; flex-direction:column; gap:8px; transition:border-color 0.2s; }
         .game-card:hover { border-color:var(--green-accent); }
         .game-card.game-live { animation:liveCardPulse 2s ease-in-out infinite; }
-        .game-time { font-size:0.75rem; font-weight:800; color:var(--text-muted); min-width:55px; text-align:center; }
-        .game-teams { flex:1; }
-        .game-matchup { font-size:0.9rem; font-weight:700; display:flex; align-items:center; gap:8px; }
-        .team-a { flex:1; text-align:right; }
-        .team-b { flex:1; text-align:left; }
-        .vs-badge { font-size:0.65rem; color:var(--text-dim); font-weight:800; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px; }
-        .game-status { font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:12px; text-transform:uppercase; letter-spacing:0.5px; min-width:65px; text-align:center; }
+
+        /* Row 1: time + badges + status */
+        .game-meta { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+        .game-time { font-size:0.72rem; font-weight:800; color:var(--text-muted); white-space:nowrap; margin-right:auto; }
+        .game-status { font-size:0.62rem; font-weight:800; padding:2px 7px; border-radius:10px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; flex-shrink:0; }
         .status-final    { background:rgba(74,222,128,0.15); color:var(--green-accent); border:1px solid rgba(74,222,128,0.3); }
         .status-live     { background:rgba(251,191,36,0.15); color:var(--gold); border:1px solid rgba(251,191,36,0.3); animation:pulse 1.5s infinite; }
         .status-upcoming { background:rgba(255,255,255,0.05); color:var(--text-dim); border:1px solid rgba(255,255,255,0.1); }
         .status-postponed{ background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); }
+
+        /* Row 2: teams + score */
+        .game-matchup-row { display:flex; align-items:center; gap:8px; }
+        .team-a { flex:1; text-align:right; font-weight:700; font-size:0.92rem; }
+        .team-b { flex:1; text-align:left;  font-weight:700; font-size:0.92rem; }
+        .vs-badge { font-size:0.65rem; color:var(--text-dim); font-weight:800; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
+        .score-center { font-size:1rem; font-weight:900; min-width:54px; text-align:center; flex-shrink:0; }
         .winner-bold { font-weight:900; color:var(--green-accent); }
 
+        /* Label (bracket) game — single row */
+        .game-label-text { flex:1; font-size:0.88rem; font-weight:700; color:var(--gold); text-align:center; }
+        /* =========================================================================== */
+
+        /* BRACKET */
         .bracket-wrapper { display:flex; gap:16px; flex-wrap:wrap; }
         .bracket-division { flex:1; min-width:280px; background:var(--green-card); border-radius:14px; padding:18px; border:1px solid var(--green-border); box-shadow:0 4px 20px rgba(0,0,0,0.3); }
         .bracket-div-title { text-align:center; font-size:1.1rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--green-border); }
@@ -131,6 +146,7 @@
         .bracket-champion-name { font-size:1rem; font-weight:900; color:var(--gold); }
         .bracket-note { text-align:center; color:var(--text-dim); font-size:0.85rem; font-weight:600; padding:40px 20px; }
 
+        /* ADMIN */
         .admin-card { background:var(--green-card); border-radius:12px; padding:20px; margin-bottom:16px; border:1px solid var(--green-border); }
         .admin-card h3 { font-size:1rem; font-weight:800; margin-bottom:16px; color:var(--gold); display:flex; align-items:center; gap:8px; }
         .pin-screen { text-align:center; padding:20px; }
@@ -174,6 +190,8 @@
         body.tv-mode .header h1 { font-size:2.2rem; }
         body.tv-mode .container { max-width:1200px; }
         body.tv-mode #tab-admin { display:none; }
+        body.tv-mode .team-a, body.tv-mode .team-b { font-size:1.1rem; }
+        body.tv-mode .game-time { font-size:0.9rem; }
 
         @media (max-width:480px) {
             .header h1 { font-size:1.1rem; }
@@ -215,10 +233,8 @@
             <div class="progress-label"><span>Tournament Progress</span><span id="progress-count">—</span></div>
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
         </div>
-        <div class="legend">
+        <div class="legend" id="standings-legend">
             <div class="legend-item"><div class="legend-dot" style="background:var(--green-accent)"></div>Playoff Spot (Top 4)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Bubble</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Eliminated</div>
         </div>
         <div class="section-title div-b-title">Division B</div>
         <table class="standings-table">
@@ -325,14 +341,14 @@
     function formatTimeDisplay(timeStr) {
         try {
             var parts = timeStr.trim().split(/\s+/);
-            var h = parseInt(parts[0].split(':')[0]);
-            var m = parseInt(parts[0].split(':')[1]) || 0;
+            var h    = parseInt(parts[0].split(':')[0]);
+            var m    = parseInt(parts[0].split(':')[1]) || 0;
             var ampm = (parts[1] || 'PM').toUpperCase();
             return m === 0 ? h + ampm + ' ET' : h + ':' + String(m).padStart(2,'0') + ampm + ' ET';
         } catch(e) { return timeStr; }
     }
-    function makeDivBadge(division) {
-        return division ? '<span class="div-badge div-' + division.toLowerCase() + '">' + division + '</span>' : '';
+    function makeDivBadge(div) {
+        return div ? '<span class="div-badge div-' + div.toLowerCase() + '">' + div + '</span>' : '';
     }
     function makeFieldBadge(field) {
         return field ? '<span class="field-badge">📍 ' + field + '</span>' : '';
@@ -440,19 +456,36 @@
         var standings    = calcStandingsByDivision(div);
         var streaks      = calcStreaks();
         var playoffSpots = parseInt(state.settings.PlayoffSpots) || 4;
-        var bubbleSpots  = playoffSpots + 2;
         var tbody        = document.getElementById('standings-body-' + div.toLowerCase());
+
+        // ✅ FIX: Only mark "eliminated" after ALL teams have finished their 3 round-robin games
+        var MAX_RR_GAMES = 3;
+        var allRRDone = standings.length > 0 && standings.every(function(t) { return t.gp >= MAX_RR_GAMES; });
+
+        // Update legend dynamically
+        var legend = document.getElementById('standings-legend');
+        if (legend) {
+            legend.innerHTML = '<div class="legend-item"><div class="legend-dot" style="background:var(--green-accent)"></div>Playoff Spot (Top 4)</div>'
+                + (allRRDone ? '<div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Not Advancing</div>' : '');
+        }
+
         var html = '';
         standings.forEach(function(team, i) {
             var rank      = i + 1;
             var diff      = team.rf - team.ra;
             var diffClass = diff > 0 ? 'diff-positive' : diff < 0 ? 'diff-negative' : 'diff-zero';
             var diffStr   = diff > 0 ? '+' + diff : '' + diff;
-            var rowClass  = rank <= playoffSpots ? 'playoff-spot' : rank <= bubbleSpots ? 'bubble-spot' : 'eliminated';
             var rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
             var rankDisp  = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
             var streak    = streaks[team.id] || 0;
             var badge     = streak >= 2 ? '<span class="streak-badge">🔥</span>' : streak <= -2 ? '<span class="streak-badge">🥶</span>' : '';
+
+            // Row colour: playoff-spot always for top 4; eliminated only after round-robin is over
+            var rowClass = '';
+            if (rank <= playoffSpots)        rowClass = 'playoff-spot';
+            else if (allRRDone)              rowClass = 'eliminated';
+            // During tournament with games remaining: no class = neutral
+
             html += '<tr class="' + rowClass + ' ' + rankClass + '">'
                 + '<td><span class="rank-num">' + rankDisp + '</span></td>'
                 + '<td class="team-name-cell">' + team.name + badge + '</td>'
@@ -484,52 +517,37 @@
     // ==================== UP NEXT / LIVE BANNER ====================
     function renderNextGameBanner() {
         var banner   = document.getElementById('next-game-banner');
-        var liveGame = null;
-        var nextGame = null;
-
+        var liveGame = null, nextGame = null;
         for (var i = 0; i < state.games.length; i++) {
-            if (state.games[i].status === 'Live' && state.games[i].home > 0 && state.games[i].away > 0) {
-                liveGame = state.games[i]; break;
-            }
+            if (state.games[i].status === 'Live' && state.games[i].home > 0 && state.games[i].away > 0) { liveGame = state.games[i]; break; }
         }
         if (!liveGame) {
             for (var j = 0; j < state.games.length; j++) {
-                if (state.games[j].status === 'Upcoming' && state.games[j].home > 0 && state.games[j].away > 0) {
-                    nextGame = state.games[j]; break;
-                }
+                if (state.games[j].status === 'Upcoming' && state.games[j].home > 0 && state.games[j].away > 0) { nextGame = state.games[j]; break; }
             }
         }
-
         if (liveGame) {
-            // ✅ FIX: build badges here, inside this function's scope
-            var divBadge   = makeDivBadge(liveGame.division);
-            var fieldBadge = makeFieldBadge(liveGame.field);
-            banner.className     = 'next-game-banner live-banner';
+            var db = makeDivBadge(liveGame.division), fb = makeFieldBadge(liveGame.field);
+            banner.className = 'next-game-banner live-banner';
             banner.style.display = 'block';
-            banner.innerHTML =
-                '<div class="next-game-label">🔴 Live Now ' + divBadge + fieldBadge + '</div>'
+            banner.innerHTML = '<div class="next-game-label">🔴 Live Now ' + db + fb + '</div>'
                 + '<div class="next-game-time">' + formatTimeDisplay(liveGame.time) + '</div>'
                 + '<div class="next-game-matchup">'
                 + '<span style="' + (liveGame.awayScore > liveGame.homeScore ? 'color:var(--green-accent)' : '') + '">' + getTeamName(liveGame.away) + '</span>'
                 + '<span class="next-game-score">' + liveGame.awayScore + ' – ' + liveGame.homeScore + '</span>'
                 + '<span style="' + (liveGame.homeScore > liveGame.awayScore ? 'color:var(--green-accent)' : '') + '">' + getTeamName(liveGame.home) + '</span>'
                 + '</div>';
-
         } else if (nextGame) {
-            // ✅ FIX: build badges here, inside this function's scope
-            var divBadge   = makeDivBadge(nextGame.division);
-            var fieldBadge = makeFieldBadge(nextGame.field);
-            banner.className     = 'next-game-banner';
+            var db = makeDivBadge(nextGame.division), fb = makeFieldBadge(nextGame.field);
+            banner.className = 'next-game-banner';
             banner.style.display = 'block';
-            banner.innerHTML =
-                '<div class="next-game-label">⏭️ Up Next ' + divBadge + fieldBadge + '</div>'
+            banner.innerHTML = '<div class="next-game-label">⏭️ Up Next ' + db + fb + '</div>'
                 + '<div class="next-game-time">' + formatDayDisplay(nextGame.day) + ' &nbsp;-&nbsp; ' + formatTimeDisplay(nextGame.time) + '</div>'
                 + '<div class="next-game-matchup">'
                 + '<span>' + getTeamName(nextGame.away) + '</span>'
                 + '<span class="vs-badge" style="font-size:0.8rem;">VS</span>'
                 + '<span>' + getTeamName(nextGame.home) + '</span>'
                 + '</div>';
-
         } else {
             banner.style.display = 'none';
         }
@@ -549,8 +567,8 @@
 
     function renderDivisionBracket(div) {
         var standings = calcStandingsByDivision(div);
-        function s(n) { return standings[n - 1] || null; }
-        function name(t) { return t ? t.name : 'TBD'; }
+        function s(n) { return standings[n-1] || null; }
+        function nm(t) { return t ? t.name : 'TBD'; }
 
         var semi1 = null, semi2 = null, champ = null;
         state.games.forEach(function(g) {
@@ -571,14 +589,12 @@
         function teamRow(seedLabel, team, score, isWinner) {
             return '<div class="bracket-team ' + (isWinner ? 'bracket-winner' : '') + '">'
                 + '<span class="bracket-seed">' + seedLabel + '</span>'
-                + '<span class="bracket-team-name">' + name(team) + '</span>'
+                + '<span class="bracket-team-name">' + nm(team) + '</span>'
                 + '<span class="bracket-score">' + (score !== null && score !== undefined ? score : '') + '</span>'
                 + '</div>';
         }
-        function roundLabel(g, label) {
-            if (played(g)) return '✅ ' + label;
-            if (live(g))   return '🔴 ' + label;
-            return '⏭️ ' + label;
+        function rl(g, lbl) {
+            return (played(g) ? '✅ ' : live(g) ? '🔴 ' : '⏭️ ') + lbl;
         }
 
         var champBox = champion
@@ -590,29 +606,26 @@
             + '<div class="bracket-layout">'
             +   '<div class="bracket-semis">'
             +     '<div class="bracket-game-card ' + (live(semi1) ? 'bracket-live' : '') + '">'
-            +       '<div class="bracket-round-label">' + roundLabel(semi1, 'Semi-Final') + '</div>'
+            +       '<div class="bracket-round-label">' + rl(semi1,'Semi-Final') + '</div>'
             +       '<div class="bracket-matchup">'
-            +         teamRow('1st', s(1), active(semi1) ? semi1.homeScore : null, played(semi1) && semi1.homeScore > semi1.awayScore)
-            +         teamRow('4th', s(4), active(semi1) ? semi1.awayScore : null, played(semi1) && semi1.awayScore > semi1.homeScore)
-            +       '</div>'
-            +     '</div>'
+            +         teamRow('1st',s(1),active(semi1)?semi1.homeScore:null,played(semi1)&&semi1.homeScore>semi1.awayScore)
+            +         teamRow('4th',s(4),active(semi1)?semi1.awayScore:null,played(semi1)&&semi1.awayScore>semi1.homeScore)
+            +       '</div></div>'
             +     '<div class="bracket-game-card ' + (live(semi2) ? 'bracket-live' : '') + '">'
-            +       '<div class="bracket-round-label">' + roundLabel(semi2, 'Semi-Final') + '</div>'
+            +       '<div class="bracket-round-label">' + rl(semi2,'Semi-Final') + '</div>'
             +       '<div class="bracket-matchup">'
-            +         teamRow('2nd', s(2), active(semi2) ? semi2.homeScore : null, played(semi2) && semi2.homeScore > semi2.awayScore)
-            +         teamRow('3rd', s(3), active(semi2) ? semi2.awayScore : null, played(semi2) && semi2.awayScore > semi2.homeScore)
-            +       '</div>'
-            +     '</div>'
+            +         teamRow('2nd',s(2),active(semi2)?semi2.homeScore:null,played(semi2)&&semi2.homeScore>semi2.awayScore)
+            +         teamRow('3rd',s(3),active(semi2)?semi2.awayScore:null,played(semi2)&&semi2.awayScore>semi2.homeScore)
+            +       '</div></div>'
             +   '</div>'
             +   '<div class="bracket-connector">→</div>'
             +   '<div class="bracket-final-col">'
             +     '<div class="bracket-game-card bracket-final-card ' + (live(champ) ? 'bracket-live' : '') + '">'
-            +       '<div class="bracket-round-label">' + (played(champ) ? '🏆 Champion!' : live(champ) ? '🔴 Championship' : '🏆 Championship') + '</div>'
+            +       '<div class="bracket-round-label">' + (played(champ)?'🏆 Champion!':live(champ)?'🔴 Championship':'🏆 Championship') + '</div>'
             +       '<div class="bracket-matchup">'
-            +         teamRow('W1', w1, active(champ) ? champ.homeScore : null, played(champ) && champ.homeScore > champ.awayScore)
-            +         teamRow('W2', w2, active(champ) ? champ.awayScore : null, played(champ) && champ.awayScore > champ.homeScore)
-            +       '</div>'
-            +       champBox
+            +         teamRow('W1',w1,active(champ)?champ.homeScore:null,played(champ)&&champ.homeScore>champ.awayScore)
+            +         teamRow('W2',w2,active(champ)?champ.awayScore:null,played(champ)&&champ.awayScore>champ.homeScore)
+            +       '</div>' + champBox
             +     '</div>'
             +   '</div>'
             + '</div></div>';
@@ -645,26 +658,33 @@
                 var sc         = isPlayed ? 'status-final' : isLive ? 'status-live' : g.status === 'Postponed' ? 'status-postponed' : 'status-upcoming';
                 var divBadge   = makeDivBadge(g.division);
                 var fieldBadge = makeFieldBadge(g.field);
+                var statusSpan = '<span class="game-status ' + sc + '">' + g.status + '</span>';
 
                 if (g.label) {
+                    // ✅ Label (bracket) game — compact single-row layout
                     html += '<div class="game-card' + liveClass + '">'
-                        + '<div class="game-time">' + formatTimeDisplay(g.time) + '</div>'
-                        + '<div style="flex:1;font-size:0.9rem;font-weight:700;color:var(--gold);text-align:center;">' + g.label + '</div>'
-                        + divBadge + fieldBadge
-                        + '<div class="game-status ' + sc + '">' + g.status + '</div>'
+                        + '<div class="game-meta">'
+                        +   '<div class="game-time">' + formatTimeDisplay(g.time) + '</div>'
+                        +   '<span class="game-label-text">' + g.label + '</span>'
+                        +   divBadge + fieldBadge + statusSpan
+                        + '</div>'
                         + '</div>';
                 } else {
+                    // ✅ Regular game — two-row layout (meta + matchup)
                     html += '<div class="game-card' + liveClass + '">'
-                        + '<div class="game-time">' + formatTimeDisplay(g.time) + '</div>'
-                        + '<div class="game-teams"><div class="game-matchup">'
-                        + '<div class="team-a ' + (awayWin ? 'winner-bold' : '') + '">' + awayName + '</div>'
-                        + (isPlayed || isLive
-                            ? '<div style="font-size:1rem;font-weight:900;min-width:60px;text-align:center;">' + g.awayScore + ' – ' + g.homeScore + '</div>'
-                            : '<span class="vs-badge">VS</span>')
-                        + '<div class="team-b ' + (homeWin ? 'winner-bold' : '') + '">' + homeName + '</div>'
-                        + '</div></div>'
-                        + divBadge + fieldBadge
-                        + '<div class="game-status ' + sc + '">' + g.status + '</div>'
+                        // Row 1: time | div | field | status
+                        + '<div class="game-meta">'
+                        +   '<div class="game-time">' + formatTimeDisplay(g.time) + '</div>'
+                        +   divBadge + fieldBadge + statusSpan
+                        + '</div>'
+                        // Row 2: away team | VS or score | home team
+                        + '<div class="game-matchup-row">'
+                        +   '<div class="team-a ' + (awayWin ? 'winner-bold' : '') + '">' + awayName + '</div>'
+                        +   (isPlayed || isLive
+                              ? '<div class="score-center">' + g.awayScore + ' – ' + g.homeScore + '</div>'
+                              : '<span class="vs-badge">VS</span>')
+                        +   '<div class="team-b ' + (homeWin ? 'winner-bold' : '') + '">' + homeName + '</div>'
+                        + '</div>'
                         + '</div>';
                 }
             });
@@ -683,143 +703,4 @@
                 document.getElementById('admin-panel').style.display = 'block';
                 populateGameSelect();
             } else {
-                document.getElementById('pin-error').style.display = 'block';
-                document.getElementById('pin-input').value = '';
-                setTimeout(function() { document.getElementById('pin-error').style.display = 'none'; }, 2000);
-            }
-        }
-    }
-
-    function populateGameSelect() {
-        var sel     = document.getElementById('game-select');
-        var currVal = sel.value;
-        sel.innerHTML = '<option value="">— Choose a game —</option>';
-        state.games.forEach(function(g) {
-            var prefix = g.division ? '[Div ' + g.division + '] ' : '';
-            var label  = g.label || (getTeamName(g.away) + ' vs ' + getTeamName(g.home));
-            sel.innerHTML += '<option value="' + g.id + '">' + prefix + formatDayDisplay(g.day) + ' ' + formatTimeDisplay(g.time) + ' — ' + label + '</option>';
-        });
-        if (currVal) sel.value = currVal;
-    }
-
-    function onGameSelect() {
-        var id   = parseInt(document.getElementById('game-select').value);
-        var game = state.games.find(function(g) { return g.id === id; });
-        if (!game) { document.getElementById('score-entry').style.display = 'none'; return; }
-        document.getElementById('score-entry').style.display   = 'block';
-        document.getElementById('away-team-label').textContent = game.label ? 'Team A (Away)' : getTeamName(game.away);
-        document.getElementById('home-team-label').textContent = game.label ? 'Team B (Home)' : getTeamName(game.home);
-        document.getElementById('away-score-input').value = game.awayScore !== undefined ? game.awayScore : '';
-        document.getElementById('home-score-input').value = game.homeScore !== undefined ? game.homeScore : '';
-        selectedStatus = (game.status === 'Upcoming') ? 'Final' : game.status;
-        updateStatusBtns();
-    }
-
-    function adjustScore(team, delta) {
-        var input = document.getElementById(team + '-score-input');
-        input.value = Math.max(0, (parseInt(input.value) || 0) + delta);
-    }
-
-    function setStatus(s) { selectedStatus = s; updateStatusBtns(); }
-
-    function updateStatusBtns() {
-        document.getElementById('btn-live').className      = 'status-btn' + (selectedStatus === 'Live'      ? ' active-live'      : '');
-        document.getElementById('btn-final').className     = 'status-btn' + (selectedStatus === 'Final'     ? ' active-final'     : '');
-        document.getElementById('btn-postponed').className = 'status-btn' + (selectedStatus === 'Postponed' ? ' active-postponed' : '');
-    }
-
-    function showAdminError(msg) {
-        var err = document.getElementById('admin-error');
-        err.textContent   = msg;
-        err.style.display = 'block';
-        setTimeout(function() { err.style.display = 'none'; }, 3500);
-    }
-
-    async function saveScore() {
-        var id = parseInt(document.getElementById('game-select').value);
-        if (!id) { showAdminError('⚠️ No game selected — choose a game from the dropdown first.'); return; }
-        var game = state.games.find(function(g) { return g.id === id; });
-        if (!game) { showAdminError('⚠️ Game not found. Try refreshing the page.'); return; }
-
-        var homeScore = parseInt(document.getElementById('home-score-input').value) || 0;
-        var awayScore = parseInt(document.getElementById('away-score-input').value) || 0;
-        var btn = document.getElementById('save-btn');
-        btn.disabled = true; btn.textContent = '⏳ Saving...';
-
-        try {
-            var formData = new FormData();
-            formData.append('gameId',    id);
-            formData.append('homeScore', homeScore);
-            formData.append('awayScore', awayScore);
-            formData.append('status',    selectedStatus);
-            var res    = await fetch(scriptURL, { method:'POST', body:formData });
-            var result = await res.json();
-            if (result.result === 'success') {
-                game.homeScore = homeScore;
-                game.awayScore = awayScore;
-                game.status    = selectedStatus;
-                render();
-                var toast = document.getElementById('save-toast');
-                toast.style.display = 'block';
-                setTimeout(function() { toast.style.display = 'none'; }, 3000);
-            }
-        } catch(e) {
-            showAdminError('❌ Save failed. Check your connection and try again.');
-        } finally {
-            btn.disabled = false; btn.textContent = '💾 Save Score';
-        }
-    }
-
-    function lockoutAdmin() {
-        state.adminUnlocked = false;
-        document.getElementById('admin-panel').style.display = 'none';
-        document.getElementById('pin-screen').style.display  = 'block';
-        document.getElementById('pin-input').value = '';
-    }
-
-    // ==================== TABS + TV ====================
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
-        document.querySelectorAll('.tab-btn').forEach(function(el)     { el.classList.remove('active'); });
-        document.getElementById(tab + '-content').classList.add('active');
-        document.getElementById('tab-' + tab).classList.add('active');
-    }
-
-    function toggleTVMode() {
-        document.body.classList.toggle('tv-mode');
-        var isTV = document.body.classList.contains('tv-mode');
-        var btn  = document.getElementById('tv-mode-btn');
-        btn.textContent = isTV ? '📱 Exit TV Mode' : '📺 TV Mode';
-        btn.classList.toggle('tv-active', isTV);
-        if (isTV) {
-            switchTab('standings');
-            tvRotateInterval = setInterval(function() {
-                var active = document.querySelector('.tab-btn.active');
-                if (active) {
-                    var next = active.id === 'tab-standings' ? 'bracket'
-                             : active.id === 'tab-bracket'  ? 'schedule'
-                             : 'standings';
-                    switchTab(next);
-                }
-            }, 25000);
-        } else {
-            clearInterval(tvRotateInterval);
-            tvRotateInterval = null;
-        }
-    }
-
-    function render() {
-        renderStandings();
-        renderBracket();
-        renderSchedule();
-        if (state.adminUnlocked) populateGameSelect();
-    }
-
-    // Poll every 15 seconds
-    setInterval(loadState, 15000);
-
-    // Init
-    loadState();
-</script>
-</body>
-</html>
+                document.
