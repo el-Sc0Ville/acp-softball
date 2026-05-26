@@ -73,6 +73,7 @@
         .rank-1 .rank-num { color:var(--gold); }
         .rank-2 .rank-num { color:#94a3b8; }
         .rank-3 .rank-num { color:#cd7f32; }
+        .rank-4 .rank-num { color: var(--green-accent); }
         .team-name-cell { font-weight:700; font-size:0.95rem; }
         .pts-cell { font-weight:900; font-size:1.1rem; color:var(--green-accent); }
         .diff-positive { color:var(--green-accent); font-weight:700; }
@@ -475,8 +476,8 @@
             var diff      = team.rf - team.ra;
             var diffClass = diff > 0 ? 'diff-positive' : diff < 0 ? 'diff-negative' : 'diff-zero';
             var diffStr   = diff > 0 ? '+' + diff : '' + diff;
-            var rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
-            var rankDisp  = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+            var rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : rank === 4 ? 'rank-4' : '';
+            var rankDisp  = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank === 4 ? '🎖️' : rank;
             var streak    = streaks[team.id] || 0;
             var badge     = streak >= 2 ? '<span class="streak-badge">🔥</span>' : streak <= -2 ? '<span class="streak-badge">🥶</span>' : '';
 
