@@ -12,6 +12,9 @@
     <meta property="og:description" content="Live standings, schedule & bracket · Shamrock Park, Pincourt · May 28–31">
     <meta property="og:type" content="website">
     <title>ACP Shamrock Classic ⚾</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         /* ============================================================
            THEME VARIABLES
@@ -53,20 +56,20 @@
            RESET & BASE
         ============================================================ */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-        html { height:100%; }
+        html { height:100%; overflow:hidden; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
             background: var(--bg);
             color: var(--text);
             height: 100%;
-            overflow-x: hidden;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
         /* ============================================================
            APP SHELL
         ============================================================ */
-        .app { display:flex; flex-direction:column; min-height:100vh; min-height:100dvh; }
+        .app { display:flex; flex-direction:column; height:100%; height:100dvh; overflow:hidden; }
 
         /* ============================================================
            HEADER
@@ -89,9 +92,9 @@
             gap: 8px;
         }
         .header-center { flex:1; text-align:center; min-width:0; }
-        .header-badges { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:4px; }
+        .header-badges { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:4px; flex-wrap:nowrap; }
         .acp-badge { background:var(--gold); color:#1a1200; font-size:0.6rem; font-weight:900; padding:3px 7px; border-radius:5px; letter-spacing:1px; flex-shrink:0; }
-        .header h1 { font-size:1.15rem; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        #tournament-name { font-size:1.15rem; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .header-sub { font-size:0.7rem; color:var(--text2); font-weight:600; padding-bottom:10px; }
         .location-link { color:var(--text2); text-decoration:none; }
         .location-link:hover { color:var(--accent); }
@@ -121,7 +124,9 @@
         .app-content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
             padding-bottom: calc(72px + env(safe-area-inset-bottom, 16px));
         }
         .tab-panel { display:none; padding:14px 12px 4px; max-width:680px; margin:0 auto; }
@@ -754,7 +759,8 @@
             const p = dayStr.replace(',','').trim().split(/\s+/);
             if (lang === 'fr') {
                 const mFR = {January:'janvier',February:'février',March:'mars',April:'avril',May:'mai',June:'juin',July:'juillet',August:'août',September:'septembre',October:'octobre',November:'novembre',December:'décembre'};
-                return p[0].substring(0,3).charAt(0).toUpperCase() + p[0].substring(0,3).slice(1).toLowerCase() + ' ' + parseInt(p[2]) + ' ' + (mFR[p[1]] || p[1]);
+                const dFR = {Sunday:'Dim',Monday:'Lun',Tuesday:'Mar',Wednesday:'Mer',Thursday:'Jeu',Friday:'Ven',Saturday:'Sam'};
+                return (dFR[p[0]] || p[0].substring(0,3)) + ' ' + parseInt(p[2]) + ' ' + (mFR[p[1]] || p[1]);
             }
             return p[0].substring(0,3).toUpperCase() + ' ' + p[1] + ' ' + parseInt(p[2]) + getDaySuffix(parseInt(p[2]));
         } catch(e) { return dayStr; }
@@ -1301,17 +1307,6 @@
     }
 
     // ==================== TABS ====================
-    function switchTab(tabName) {
-        document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('active'); el.setAttribute('aria-selected','false'); });
-        document.getElementById(tabName + '-panel').classList.add('active');
-        const btn = document.getElementById('tab-' + tabName);
-        btn.classList.add('active'); btn.setAttribute('aria-selected','true');
-        if (tabName === 'info' && !weatherLoaded) {
-            weatherLoaded = true;
-            loadWeatherInfo();
-        }
-    }
     // Map panel IDs: admin tab → admin-panel-tab
     const panelMap = { standings:'standings-panel', bracket:'bracket-panel', schedule:'schedule-panel', info:'info-panel', admin:'admin-panel-tab' };
     function switchTab(tabName) {
