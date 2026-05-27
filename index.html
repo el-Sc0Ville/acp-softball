@@ -117,6 +117,9 @@
         }
         .toggle-btn:hover { border-color:var(--accent); color:var(--accent); }
         .toggle-btn:active { transform:scale(0.95); }
+        .header-right { display:flex; gap:6px; flex-shrink:0; align-items:center; }
+        @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+        .toggle-btn.spinning { animation:spin 0.7s linear; pointer-events:none; }
 
         /* ============================================================
            CONTENT AREA
@@ -364,6 +367,25 @@
         .accordion-item.open .accordion-chevron { transform:rotate(180deg); }
         .accordion-body { display:none; padding-bottom:6px; }
         .accordion-item.open .accordion-body { display:block; }
+        /* Fix: .info-rule uses flex layout; prevent lang toggle from overriding it to block */
+        body.fr .info-rule.lang-fr { display:flex; }
+
+        /* Today's games horizontal scroll */
+        .today-games-section { margin-bottom:14px; }
+        .today-games-label { font-size:0.72rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; padding:0 1px; }
+        .today-games-scroll { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+        .today-games-scroll::-webkit-scrollbar { display:none; }
+        .today-game-card { flex-shrink:0; width:162px; background:var(--card); border-radius:12px; border:1px solid color-mix(in srgb,var(--gold) 22%,transparent); border-left:3px solid var(--gold); padding:10px 12px; }
+        .today-game-card.live-card { border-color:color-mix(in srgb,var(--red) 25%,transparent); border-left-color:var(--red); animation:liveGlow 2s ease-in-out infinite; }
+        .today-game-card.final-card { border-left-color:var(--text3); opacity:0.7; }
+        .tgc-header { font-size:0.72rem; font-weight:600; color:var(--text3); margin-bottom:7px; display:flex; align-items:center; flex-wrap:wrap; gap:3px; }
+        .tgc-teams { display:flex; flex-direction:column; gap:3px; }
+        .tgc-team { font-size:0.82rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .tgc-vs { font-size:0.65rem; font-weight:800; color:var(--text3); letter-spacing:0.04em; padding:1px 0; }
+        .tgc-score { font-size:0.92rem; font-weight:800; color:var(--text); display:flex; align-items:center; gap:5px; padding:1px 0; }
+        .tgc-dash { color:var(--text3); font-weight:400; }
+        .tgc-status { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-top:6px; color:var(--text3); }
+        .tgc-status.live-status { color:var(--red); }
 
         /* ============================================================
            ANNOUNCEMENT BANNER
@@ -478,7 +500,10 @@
                     &nbsp;·&nbsp; <span id="hdr-dates">May 28–31</span>
                 </div>
             </div>
-            <button class="toggle-btn" id="theme-btn" onclick="switchTheme()" aria-label="Toggle theme">☀️</button>
+            <div class="header-right">
+                <button class="toggle-btn" id="refresh-btn" onclick="manualRefresh()" aria-label="Refresh data" style="font-size:1rem;">↻</button>
+                <button class="toggle-btn" id="theme-btn" onclick="switchTheme()" aria-label="Toggle theme">☀️</button>
+            </div>
         </div>
     </header>
 
@@ -496,6 +521,10 @@
 
         <!-- STANDINGS -->
         <div id="standings-panel" class="tab-panel active" role="tabpanel" aria-labelledby="tab-standings">
+            <div class="today-games-section" id="today-games-section" style="display:none;">
+                <div class="today-games-label" id="today-games-label"></div>
+                <div class="today-games-scroll" id="today-games-scroll"></div>
+            </div>
             <div class="next-game-banner" id="next-game-banner" style="display:none;"></div>
             <div class="progress-section">
                 <div class="progress-label">
@@ -910,7 +939,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Team', col_gp:'GP', col_w:'W', col_l:'L', col_t:'T', col_pts:'Pts',
             loading:'Loading... ⚾', no_games:'No games played yet',
-            live_now:'🔴 Live Now', up_next:'⏭️ Up Next',
+            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', lbl_today:"Today's Games",
             st_final:'Final', st_live:'Live', st_upcoming:'Upcoming', st_postponed:'Postponed',
             bracket_tbd:'Bracket populates once round-robin games are played 🏟️',
             semi_final:'Semi-Final', championship:'Championship',
@@ -946,7 +975,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Équipe', col_gp:'MJ', col_w:'V', col_l:'D', col_t:'N', col_pts:'Pts',
             loading:'Chargement... ⚾', no_games:'Aucun match joué',
-            live_now:'🔴 En direct', up_next:'⏭️ Prochain match',
+            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', lbl_today:"Matchs du jour",
             st_final:'Final', st_live:'En direct', st_upcoming:'À venir', st_postponed:'Reporté',
             bracket_tbd:'Le tableau sera disponible après les matchs préliminaires 🏟️',
             semi_final:'Demi-finale', championship:'Finale',
@@ -1270,44 +1299,113 @@
         document.getElementById('lbl-progress').textContent   = t('lbl_progress');
     }
 
+    // ==================== MANUAL REFRESH ====================
+    async function manualRefresh() {
+        const btn = document.getElementById('refresh-btn');
+        if (btn) { btn.classList.add('spinning'); btn.disabled = true; }
+        lastDataHash = null;
+        await loadState();
+        if (btn) {
+            btn.classList.remove('spinning');
+            btn.disabled = false;
+        }
+    }
+
     // ==================== NEXT GAME BANNER ====================
     function renderNextGameBanner() {
-        const banner = document.getElementById('next-game-banner');
-        let liveGame = null, nextGame = null;
-        for (let i = 0; i < state.games.length; i++) {
-            if (state.games[i].status === 'Live' && state.games[i].home > 0 && state.games[i].away > 0) { liveGame = state.games[i]; break; }
-        }
-        if (!liveGame) {
-            for (let j = 0; j < state.games.length; j++) {
-                if (state.games[j].status === 'Upcoming' && state.games[j].home > 0 && state.games[j].away > 0) { nextGame = state.games[j]; break; }
-            }
-        }
-        if (liveGame) {
-            const db = makeDivBadge(liveGame.division), fb = makeFieldBadge(liveGame.field);
-            const wx = makeWxBadgeBanner(liveGame);
-            banner.className = 'next-game-banner live-banner';
-            banner.style.display = 'block';
-            banner.innerHTML = '<div class="next-game-label">' + t('live_now') + wx + ' ' + db + fb + '</div>'
-                + '<div class="next-game-time">' + formatTimeDisplay(liveGame.time) + '</div>'
-                + '<div class="next-game-matchup">'
-                + '<span style="' + (liveGame.awayScore > liveGame.homeScore ? 'color:var(--accent)' : '') + '">' + getTeamName(liveGame.away) + '</span>'
-                + '<span class="next-game-score">' + liveGame.awayScore + ' – ' + liveGame.homeScore + '</span>'
-                + '<span style="' + (liveGame.homeScore > liveGame.awayScore ? 'color:var(--accent)' : '') + '">' + getTeamName(liveGame.home) + '</span>'
-                + '</div>';
-        } else if (nextGame) {
-            const db = makeDivBadge(nextGame.division), fb = makeFieldBadge(nextGame.field);
-            const wx = makeWxBadgeBanner(nextGame);
-            banner.className = 'next-game-banner';
-            banner.style.display = 'block';
-            banner.innerHTML = '<div class="next-game-label">' + t('up_next') + wx + ' ' + db + fb + '</div>'
-                + '<div class="next-game-time">' + formatDayDisplay(nextGame.day) + ' &nbsp;·&nbsp; ' + formatTimeDisplay(nextGame.time) + '</div>'
-                + '<div class="next-game-matchup">'
-                + '<span>' + getTeamName(nextGame.away) + '</span>'
-                + '<span class="vs-badge">VS</span>'
-                + '<span>' + getTeamName(nextGame.home) + '</span>'
-                + '</div>';
-        } else {
+        const banner      = document.getElementById('next-game-banner');
+        const todaySection = document.getElementById('today-games-section');
+        const todayScroll  = document.getElementById('today-games-scroll');
+        const todayLabel   = document.getElementById('today-games-label');
+
+        // Build today's date string in the same format GAS uses: "Thursday, May 28"
+        const todayStr = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })
+                                   .replace(/,\s*\d{4}$/, '');
+
+        const todayGames = state.games.filter(g => g.home > 0 && g.away > 0 && g.day === todayStr);
+
+        if (todayGames.length > 0) {
+            // ---- Horizontal scroll: all of today's games ----
             banner.style.display = 'none';
+            todaySection.style.display = 'block';
+
+            const hasLive = todayGames.some(g => g.status === 'Live');
+            todayLabel.textContent = hasLive ? t('live_now') : t('lbl_today');
+
+            todayScroll.innerHTML = todayGames.map(g => {
+                const isLive  = g.status === 'Live';
+                const isFinal = g.status === 'Final';
+                const db = makeDivBadge(g.division);
+                const fb = makeFieldBadge(g.field);
+                const wx = makeWxBadgeBanner(g);
+
+                let middleRow;
+                if (isLive || isFinal) {
+                    const awayWin = g.awayScore > g.homeScore;
+                    const homeWin = g.homeScore > g.awayScore;
+                    middleRow = '<div class="tgc-score">'
+                        + '<span' + (awayWin ? ' style="color:var(--accent)"' : '') + '>' + g.awayScore + '</span>'
+                        + '<span class="tgc-dash">–</span>'
+                        + '<span' + (homeWin ? ' style="color:var(--accent)"' : '') + '>' + g.homeScore + '</span>'
+                        + '</div>';
+                } else {
+                    middleRow = '<div class="tgc-vs">VS</div>';
+                }
+
+                const statusLine = isLive  ? '<div class="tgc-status live-status">' + t('st_live')  + '</div>'
+                                 : isFinal ? '<div class="tgc-status">'              + t('st_final') + '</div>'
+                                 : '';
+
+                return '<div class="today-game-card' + (isLive ? ' live-card' : '') + (isFinal ? ' final-card' : '') + '">'
+                    + '<div class="tgc-header">' + formatTimeDisplay(g.time) + wx + ' ' + db + fb + '</div>'
+                    + '<div class="tgc-teams">'
+                    + '<span class="tgc-team">' + getTeamName(g.away) + '</span>'
+                    + middleRow
+                    + '<span class="tgc-team">' + getTeamName(g.home) + '</span>'
+                    + '</div>'
+                    + statusLine
+                    + '</div>';
+            }).join('');
+
+        } else {
+            // ---- Fallback: single "up next" or live card (pre-tournament / post-tournament) ----
+            todaySection.style.display = 'none';
+            let liveGame = null, nextGame = null;
+            for (let i = 0; i < state.games.length; i++) {
+                if (state.games[i].status === 'Live' && state.games[i].home > 0 && state.games[i].away > 0) { liveGame = state.games[i]; break; }
+            }
+            if (!liveGame) {
+                for (let j = 0; j < state.games.length; j++) {
+                    if (state.games[j].status === 'Upcoming' && state.games[j].home > 0 && state.games[j].away > 0) { nextGame = state.games[j]; break; }
+                }
+            }
+            if (liveGame) {
+                const db = makeDivBadge(liveGame.division), fb = makeFieldBadge(liveGame.field);
+                const wx = makeWxBadgeBanner(liveGame);
+                banner.className = 'next-game-banner live-banner';
+                banner.style.display = 'block';
+                banner.innerHTML = '<div class="next-game-label">' + t('live_now') + wx + ' ' + db + fb + '</div>'
+                    + '<div class="next-game-time">' + formatTimeDisplay(liveGame.time) + '</div>'
+                    + '<div class="next-game-matchup">'
+                    + '<span style="' + (liveGame.awayScore > liveGame.homeScore ? 'color:var(--accent)' : '') + '">' + getTeamName(liveGame.away) + '</span>'
+                    + '<span class="next-game-score">' + liveGame.awayScore + ' – ' + liveGame.homeScore + '</span>'
+                    + '<span style="' + (liveGame.homeScore > liveGame.awayScore ? 'color:var(--accent)' : '') + '">' + getTeamName(liveGame.home) + '</span>'
+                    + '</div>';
+            } else if (nextGame) {
+                const db = makeDivBadge(nextGame.division), fb = makeFieldBadge(nextGame.field);
+                const wx = makeWxBadgeBanner(nextGame);
+                banner.className = 'next-game-banner';
+                banner.style.display = 'block';
+                banner.innerHTML = '<div class="next-game-label">' + t('up_next') + wx + ' ' + db + fb + '</div>'
+                    + '<div class="next-game-time">' + formatDayDisplay(nextGame.day) + ' &nbsp;·&nbsp; ' + formatTimeDisplay(nextGame.time) + '</div>'
+                    + '<div class="next-game-matchup">'
+                    + '<span>' + getTeamName(nextGame.away) + '</span>'
+                    + '<span class="vs-badge">VS</span>'
+                    + '<span>' + getTeamName(nextGame.home) + '</span>'
+                    + '</div>';
+            } else {
+                banner.style.display = 'none';
+            }
         }
     }
 
