@@ -345,6 +345,73 @@
         .lang-fr { display:none; }
         body.fr .lang-en { display:none; }
         body.fr .lang-fr { display:block; }
+        /* Accordion title spans must stay inline, not become block */
+        body.fr .accordion-title .lang-fr { display:inline; }
+
+        /* ============================================================
+           ACCORDION (Rules)
+        ============================================================ */
+        .accordion-item { border-bottom:1px solid color-mix(in srgb,var(--text) 5%,transparent); }
+        .accordion-item:last-child { border-bottom:none; }
+        .accordion-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:12px 0; cursor:pointer; width:100%; background:none;
+            border:none; text-align:left; color:var(--text);
+        }
+        .accordion-header:active { opacity:0.75; }
+        .accordion-title { font-size:0.88rem; font-weight:700; display:flex; align-items:center; gap:6px; }
+        .accordion-chevron { font-size:0.6rem; color:var(--text3); transition:transform 0.25s; flex-shrink:0; margin-left:6px; }
+        .accordion-item.open .accordion-chevron { transform:rotate(180deg); }
+        .accordion-body { display:none; padding-bottom:6px; }
+        .accordion-item.open .accordion-body { display:block; }
+
+        /* ============================================================
+           ANNOUNCEMENT BANNER
+        ============================================================ */
+        .announcement-bar {
+            flex-shrink: 0;
+            background: color-mix(in srgb, var(--gold) 12%, transparent);
+            border-bottom: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+            padding: 9px 14px;
+        }
+        .announcement-inner {
+            display: flex; align-items: flex-start; gap: 9px;
+            max-width: 680px; margin: 0 auto;
+        }
+        .announcement-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 2px; }
+        .announcement-text {
+            flex: 1; font-size: 0.78rem; font-weight: 600;
+            color: var(--gold); line-height: 1.5;
+        }
+        .announcement-dismiss {
+            background: none; border: none; color: var(--text3);
+            font-size: 1rem; line-height: 1; cursor: pointer;
+            flex-shrink: 0; padding: 0 0 0 6px;
+        }
+        .announcement-dismiss:active { opacity: 0.6; }
+        .footer-credit {
+            text-align: center; padding: 28px 14px 12px;
+            font-size: 0.72rem; color: var(--text3); line-height: 1.8;
+        }
+        .telus-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            background: #4B178A; color: #fff;
+            font-size: 0.68rem; font-weight: 900;
+            padding: 2px 7px 2px 5px; border-radius: 4px;
+            letter-spacing: 0.07em; vertical-align: middle;
+            line-height: 1.5; position: relative; top: -1px;
+        }
+        .telus-dot {
+            width: 5px; height: 5px; background: #67CC4E;
+            border-radius: 50%; display: inline-block; flex-shrink: 0;
+        }
+        .form-textarea {
+            width: 100%; background: color-mix(in srgb, var(--text) 6%, transparent);
+            border: 1.5px solid var(--border); border-radius: 10px; color: var(--text);
+            font-size: 0.88rem; font-weight: 500; padding: 10px 12px; outline: none;
+            transition: border-color 0.2s; resize: vertical; font-family: inherit; line-height: 1.5;
+        }
+        .form-textarea:focus { border-color: var(--accent); }
 
         /* ============================================================
            ADMIN
@@ -414,6 +481,15 @@
             <button class="toggle-btn" id="theme-btn" onclick="switchTheme()" aria-label="Toggle theme">☀️</button>
         </div>
     </header>
+
+    <!-- ==================== ANNOUNCEMENT BANNER ==================== -->
+    <div id="announcement-bar" class="announcement-bar" style="display:none;" role="status" aria-live="polite">
+        <div class="announcement-inner">
+            <span class="announcement-icon">📢</span>
+            <span class="announcement-text" id="announcement-text"></span>
+            <button class="announcement-dismiss" onclick="dismissAnnouncement()" aria-label="Dismiss announcement">✕</button>
+        </div>
+    </div>
 
     <!-- ==================== CONTENT ==================== -->
     <main class="app-content">
@@ -512,45 +588,177 @@
                 </div>
             </div>
 
-            <!-- OFFICIAL RULES -->
+            <!-- OFFICIAL RULES ACCORDION -->
             <div class="section-title">📋 <span id="lbl-rules-title">Official Rules</span></div>
-            <div class="info-card">
-                <div class="lang-en">
-                    <div class="info-rule"><span class="info-rule-icon">⚾</span><span><strong style="color:var(--text);">Game Length</strong> — [PLACEHOLDER — e.g. 7 innings or 75-minute time limit]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🏃</span><span><strong style="color:var(--text);">Mercy Rule</strong> — [PLACEHOLDER — e.g. 15-run lead after 3 innings, 10-run after 5]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🥎</span><span><strong style="color:var(--text);">Pitching</strong> — [PLACEHOLDER — e.g. Slow-pitch, arc 6–12 feet]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🦺</span><span><strong style="color:var(--text);">Player Eligibility</strong> — [PLACEHOLDER — e.g. Registered players only]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">📏</span><span><strong style="color:var(--text);">Lineup</strong> — [PLACEHOLDER — e.g. Minimum 8 players to start]</span></div>
-                    <!-- ✏️ UPDATE EN: Replace [PLACEHOLDER] items with final rules -->
+            <div class="info-card" style="padding-top:4px;padding-bottom:4px;">
+
+                <!-- 1. ROSTER & LINEUP -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+                        <span class="accordion-title">👥 <span class="lang-en">Roster &amp; Lineup</span><span class="lang-fr">Effectif &amp; Formation</span></span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="info-rule lang-en"><span class="info-rule-icon">1</span><span>Teams can field up to <strong style="color:var(--text);">10 players (2 must be women)</strong>. No illegal infield shifts — 2 infielders left of 2nd base, 2 right. All other defenders must be on the grass before the ball is hit.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">1</span><span>Les équipes peuvent aligner jusqu'à <strong style="color:var(--text);">10 joueurs (dont 2 femmes)</strong>. Aucun déplacement illégal dans le champ intérieur — 2 joueurs à gauche du 2e but, 2 à droite. Tous les défenseurs doivent être sur le gazon avant que la balle soit frappée.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">2</span><span>A team may play <strong style="color:var(--text);">shorthanded (min. 8 players)</strong> as long as they field at least 2 women. Only active players may bat — no one bats twice in an inning.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">2</span><span>Une équipe peut jouer en <strong style="color:var(--text);">infériorité numérique (min. 8 joueurs)</strong> à condition d'aligner au moins 2 joueuses. Seuls les joueurs actifs peuvent frapper — personne ne frappe deux fois dans une manche.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">3</span><span>Each team is allowed a <strong style="color:var(--text);">5-minute grace period</strong> to field a full team.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">3</span><span>Chaque équipe dispose d'un <strong style="color:var(--text);">délai de grâce de 5 minutes</strong> pour aligner une équipe complète.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">10</span><span>Every player must bat. Up to <strong style="color:var(--text);">11 batters including a DH</strong> are permitted.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">10</span><span>Chaque joueur doit frapper. Jusqu'à <strong style="color:var(--text);">11 frappeurs, y compris un frappeur désigné</strong>, sont permis.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">27</span><span>Each player must play <strong style="color:var(--text);">minimum 1 round-robin game</strong> to qualify for the playoffs.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">27</span><span>Chaque joueur doit disputer <strong style="color:var(--text);">au moins un match du tournoi à la ronde</strong> pour se qualifier pour les séries éliminatoires.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">28</span><span>No player can be <strong style="color:var(--text);">"last batter"</strong> on 2 or more teams in the same division.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">28</span><span>Aucun joueur ne peut être <strong style="color:var(--text);">« dernier frappeur »</strong> dans deux équipes ou plus d'une même division.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">29</span><span>Spares may play on <strong style="color:var(--text);">multiple teams or multiple divisions</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">29</span><span>Les remplaçants peuvent jouer dans <strong style="color:var(--text);">plusieurs équipes ou divisions</strong>.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">30</span><span>A substitute player must <strong style="color:var(--text);">bat AND play that defensive inning</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">30</span><span>Le remplaçant doit <strong style="color:var(--text);">frapper ET jouer cette manche défensive</strong>.</span></div>
+                    </div>
                 </div>
-                <div class="lang-fr">
-                    <div class="info-rule"><span class="info-rule-icon">⚾</span><span><strong style="color:var(--text);">Durée du match</strong> — [PLACEHOLDER — ex. 7 manches ou limite de 75 minutes]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🏃</span><span><strong style="color:var(--text);">Règle de miséricorde</strong> — [PLACEHOLDER — ex. avance de 15 points après 3 manches]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🥎</span><span><strong style="color:var(--text);">Lancer</strong> — [PLACEHOLDER — ex. Balle-molle lente, arc 6–12 pieds]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🦺</span><span><strong style="color:var(--text);">Admissibilité des joueurs</strong> — [PLACEHOLDER — ex. Joueurs inscrits seulement]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">📏</span><span><strong style="color:var(--text);">Formation</strong> — [PLACEHOLDER — ex. Minimum 8 joueurs pour commencer]</span></div>
-                    <!-- ✏️ UPDATE FR: Remplacer les [PLACEHOLDER] par les règlements finals -->
+
+                <!-- 2. GAME FORMAT -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+                        <span class="accordion-title">🏟️ <span class="lang-en">Game Format</span><span class="lang-fr">Format de jeu</span></span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="info-rule lang-en"><span class="info-rule-icon">4</span><span>The <strong style="color:var(--text);">home team</strong> is decided by a coin flip prior to the game.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">4</span><span>L'<strong style="color:var(--text);">équipe à domicile</strong> est déterminée par tirage au sort avant le match.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">5</span><span><strong style="color:var(--text);">Round robin &amp; semi-finals: 4 innings. Finals: 5 innings</strong> (all divisions).</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">5</span><span><strong style="color:var(--text);">Ronde préliminaire et demi-finales : 4 manches. Finales : 5 manches</strong> (toutes divisions).</span></div>
+                    </div>
                 </div>
+
+                <!-- 3. PITCHING & BATTING -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+                        <span class="accordion-title">🥎 <span class="lang-en">Pitching &amp; Batting</span><span class="lang-fr">Lancer &amp; Frapper</span></span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="info-rule lang-en"><span class="info-rule-icon">6</span><span>The <strong style="color:var(--text);">batting team provides the pitcher</strong>, who must pitch from behind the screen.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">6</span><span>L'<strong style="color:var(--text);">équipe au bâton désigne le lanceur</strong>, qui doit lancer derrière l'écran.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">7</span><span>If the batted ball hits the pitcher on any of the 3 pitches, <strong style="color:var(--text);">the batter is out</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">7</span><span>Si la balle frappée touche le lanceur sur l'un des 3 lancers, <strong style="color:var(--text);">le frappeur est retiré</strong>.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">8</span><span>A ball hitting the screen is <strong style="color:var(--text);">dead and counts as 1 of 3 pitches</strong>. Hitting the screen on the 3rd pitch = batter OUT.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">8</span><span>Une balle qui touche l'écran est <strong style="color:var(--text);">morte et compte comme l'un des 3 lancers</strong>. Toucher l'écran au 3e lancer = frappeur RETIRÉ.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">9</span><span>The batter has <strong style="color:var(--text);">3 pitches to put the ball in play</strong>. Failing to do so = OUT.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">9</span><span>Le frappeur dispose de <strong style="color:var(--text);">3 lancers pour mettre la balle en jeu</strong>. S'il échoue = RETIRÉ.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">11</span><span><strong style="color:var(--text);">Only the last batter may hit a home run.</strong> Any other player hitting a HR is out, and runners cannot advance.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">11</span><span><strong style="color:var(--text);">Seul le dernier frappeur peut frapper un coup de circuit.</strong> Tout autre joueur qui frappe un CC est retiré, et les coureurs ne peuvent avancer.</span></div>
+                    </div>
+                </div>
+
+                <!-- 4. BASERUNNING -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+                        <span class="accordion-title">🏃 <span class="lang-en">Baserunning</span><span class="lang-fr">Course sur les buts</span></span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="info-rule lang-en"><span class="info-rule-icon">12</span><span><strong style="color:var(--text);">No stealing bases</strong> at any time.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">12</span><span><strong style="color:var(--text);">Interdiction de voler des buts</strong> en tout temps.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">13</span><span>A runner may only <strong style="color:var(--text);">leave the base once the ball is hit</strong>. Violation = OUT.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">13</span><span>Un coureur ne peut quitter le but <strong style="color:var(--text);">qu'une fois la balle frappée</strong>. Infraction = RETIRÉ.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">14</span><span><strong style="color:var(--text);">Tagging from any base on a fly ball</strong> is permitted.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">14</span><span><strong style="color:var(--text);">Le retrait sur ballon depuis n'importe quel but</strong> est autorisé.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">15</span><span><strong style="color:var(--text);">Pinch runner:</strong> injured players only. The injured player must still bat; PR can advance max 1st base on the initial hit. Once used, a PR must be used for the rest of the game. PR = last recorded out.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">15</span><span><strong style="color:var(--text);">Coureur suppléant :</strong> joueurs blessés seulement. Le joueur blessé doit quand même frapper ; le CS ne peut avancer que jusqu'au 1er but sur le coup sûr initial. Une fois utilisé, le CS est obligatoire pour le reste du match. CS = dernier retiré.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">16</span><span>Runners <strong style="color:var(--text);">must slide on close plays</strong>. Intentionally hindering a throw may result in an OUT at the umpire's discretion.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">16</span><span>Les coureurs <strong style="color:var(--text);">doivent glisser en cas de jeu serré</strong>. Gêner intentionnellement un relais peut entraîner un retrait à la discrétion de l'arbitre.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">17</span><span>A <strong style="color:var(--text);">commit line</strong> is set between 3rd base and home. Once crossed, the runner <strong style="color:var(--text);">cannot return to 3rd base</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">17</span><span>Une <strong style="color:var(--text);">ligne d'engagement</strong> est établie entre le 3e but et le marbre. Une fois franchie, le coureur <strong style="color:var(--text);">ne peut plus retourner au 3e but</strong>.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">18–19</span><span>At home plate, the runner <strong style="color:var(--text);">must NOT touch the plate</strong> (out if they do — a scoring line is set up to avoid collisions). <strong style="color:var(--text);">Home plate is always a force play.</strong></span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">18–19</span><span>Au marbre, le coureur <strong style="color:var(--text);">ne doit PAS toucher le marbre</strong> (retiré s'il le touche — une ligne est établie pour éviter les collisions). <strong style="color:var(--text);">Le jeu au marbre est toujours forcé.</strong></span></div>
+                    </div>
+                </div>
+
+                <!-- 5. FIELDING & EQUIPMENT -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+                        <span class="accordion-title">🧤 <span class="lang-en">Fielding &amp; Equipment</span><span class="lang-fr">Champ &amp; Équipement</span></span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="info-rule lang-en"><span class="info-rule-icon">20</span><span>All outfielders and rovers must <strong style="color:var(--text);">stay on the grass until the ball is hit</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">20</span><span>Tous les voltigeurs et rovers doivent <strong style="color:var(--text);">rester sur le gazon jusqu'à ce que la balle soit frappée</strong>.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">21</span><span>Eligible bats are those <strong style="color:var(--text);">not currently banned by ASA and USSSA</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">21</span><span>Les battes admissibles sont celles <strong style="color:var(--text);">non interdites par l'ASA et l'USSSA</strong>.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">22</span><span><strong style="color:var(--text);">No steel spike shoes</strong> are permitted.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">22</span><span><strong style="color:var(--text);">Les chaussures à crampons en acier sont interdites.</strong></span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">31</span><span>If a fielder deflects the ball over the HR fence while the <strong style="color:var(--text);">last batter</strong> is up = <strong style="color:var(--text);">home run</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">31</span><span>Si un défenseur dévie la balle par-dessus la clôture alors que le <strong style="color:var(--text);">dernier frappeur</strong> est en jeu = <strong style="color:var(--text);">coup de circuit</strong>.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">32</span><span>If a fielder deflects the ball over the fence for a <strong style="color:var(--text);">non-last batter</strong> = <strong style="color:var(--text);">ground rule double</strong>; runners advance 2 bases.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">32</span><span>Si un défenseur dévie la balle par-dessus la clôture pour un <strong style="color:var(--text);">frappeur autre que le dernier</strong> = <strong style="color:var(--text);">double au sol</strong> ; les coureurs avancent de 2 buts.</span></div>
+                    </div>
+                </div>
+
+                <!-- 6. CONDUCT & ADMINISTRATION -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+                        <span class="accordion-title">⚖️ <span class="lang-en">Conduct &amp; Administration</span><span class="lang-fr">Conduite &amp; Administration</span></span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <div class="info-rule lang-en"><span class="info-rule-icon">23</span><span>Missing a scheduled game without <strong style="color:var(--text);">24-hour notice</strong> = forfeit, recorded as an <strong style="color:var(--text);">11–0 loss</strong>.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">23</span><span>Manquer un match sans <strong style="color:var(--text);">préavis de 24 heures</strong> = forfait, enregistré comme une <strong style="color:var(--text);">défaite 11–0</strong>.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">24</span><span>Only the <strong style="color:var(--text);">team captain</strong> may question the umpire's calls. Umpires are volunteers — respect their decisions. Players who dispute calls may be ejected.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">24</span><span>Seul le <strong style="color:var(--text);">capitaine de l'équipe</strong> peut contester les décisions de l'arbitre. Les arbitres sont bénévoles — respectez leurs décisions. Les joueurs contestataires peuvent être expulsés.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">25</span><span>The umpire may <strong style="color:var(--text);">eject any player from the game and/or park</strong>. The tournament committee decides on full-tournament ejection.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">25</span><span>L'arbitre peut <strong style="color:var(--text);">expulser tout joueur du match et/ou du parc</strong>. Le comité du tournoi décide d'une expulsion pour l'ensemble du tournoi.</span></div>
+
+                        <div class="info-rule lang-en"><span class="info-rule-icon">26</span><span>The tournament, the City of Pincourt, and A.C.P. are <strong style="color:var(--text);">not responsible for injuries</strong> on or off the field. All players play at their own risk — team captains must inform their players.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">26</span><span>Le tournoi, la Ville de Pincourt et l'A.C.P. ne sont <strong style="color:var(--text);">pas responsables des blessures</strong> sur ou hors du terrain. Tous les joueurs jouent à leurs propres risques — les capitaines doivent en informer leurs joueurs.</span></div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- TIEBREAKER RULES -->
             <div class="section-title">⚖️ <span id="lbl-tb-title">Tiebreaker Rules</span></div>
             <div class="info-card">
                 <div class="lang-en">
-                    <p style="margin-bottom:12px;">When teams are tied on points, standings are decided in this order:</p>
+                    <div class="info-highlight">In round-robin play, <strong style="color:var(--text);">ties stand</strong> and are recorded as a tie (1 point each). In semi-finals and finals, tied games continue with <strong style="color:var(--text);">extra innings</strong> until a winner is determined.</div>
+                    <p style="margin-bottom:12px;">When teams are tied on points in the standings, positions are decided in this order:</p>
                     <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">1</span><span><strong style="color:var(--text);">Run Differential (RD)</strong> — Runs scored minus runs allowed.</span></div>
-                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">2</span><span><strong style="color:var(--text);">Runs Scored (PF)</strong> — Total runs scored across all round-robin games.</span></div>
-                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">3</span><span><strong style="color:var(--text);">Head-to-Head Record</strong> — Result of the game(s) between the tied teams.</span></div>
-                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">4</span><span><strong style="color:var(--text);">[PLACEHOLDER]</strong> — [e.g. Coin flip / tournament committee decision]</span></div>
-                    <!-- ✏️ UPDATE EN: Verify order and fill in tiebreaker #4 -->
+                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">2</span><span><strong style="color:var(--text);">Head-to-Head Record</strong> — Result of the game(s) played directly between the tied teams.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">3</span><span><strong style="color:var(--text);">Common Game W/L</strong> — Win/loss record in games played against opponents both tied teams faced.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">4</span><span><strong style="color:var(--text);">Coin Flip</strong> — Tournament committee conducts a coin flip.</span></div>
                 </div>
                 <div class="lang-fr">
-                    <p style="margin-bottom:12px;">En cas d'égalité de points, le classement est déterminé dans cet ordre :</p>
+                    <div class="info-highlight">Dans le tournoi à la ronde, les <strong style="color:var(--text);">matchs nuls restent nuls</strong> (1 point chacun). En demi-finales et en finale, les matchs à égalité se prolongent en <strong style="color:var(--text);">manches supplémentaires</strong> jusqu'à ce qu'un gagnant soit désigné.</div>
+                    <p style="margin-bottom:12px;">En cas d'égalité de points au classement, les positions sont déterminées dans cet ordre :</p>
                     <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">1</span><span><strong style="color:var(--text);">Différentiel de points (DB)</strong> — Points marqués moins points accordés.</span></div>
-                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">2</span><span><strong style="color:var(--text);">Points marqués (BP)</strong> — Total de points marqués en ronde préliminaire.</span></div>
-                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">3</span><span><strong style="color:var(--text);">Résultat des confrontations directes</strong> — Résultat(s) des matchs entre les équipes à égalité.</span></div>
-                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">4</span><span><strong style="color:var(--text);">[PLACEHOLDER]</strong> — [ex. Tirage au sort / décision du comité]</span></div>
-                    <!-- ✏️ UPDATE FR: Vérifier l'ordre et compléter le bris d'égalité #4 -->
+                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">2</span><span><strong style="color:var(--text);">Confrontation directe</strong> — Résultat(s) des matchs disputés directement entre les équipes à égalité.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">3</span><span><strong style="color:var(--text);">Matchs communs</strong> — Bilan victoires/défaites dans les matchs joués contre des adversaires communs.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon" style="color:var(--gold);font-weight:900;">4</span><span><strong style="color:var(--text);">Tirage au sort</strong> — Le comité du tournoi procède à un tirage à pile ou face.</span></div>
                 </div>
             </div>
 
@@ -558,20 +766,28 @@
             <div class="section-title">⛈️ <span id="lbl-wx-title">Weather &amp; Delay Policy</span></div>
             <div class="info-card">
                 <div class="lang-en">
-                    <div class="info-highlight">⚠️ In the event of severe weather, the tournament director will communicate updates through [PLACEHOLDER — e.g. team captains / PA system / this app].</div>
-                    <div class="info-rule"><span class="info-rule-icon">🌧️</span><span><strong style="color:var(--text);">Rain Delay</strong> — [PLACEHOLDER — e.g. Games suspended after 30-minute delay. Director assesses conditions and notifies captains.]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">⚡</span><span><strong style="color:var(--text);">Lightning</strong> — [PLACEHOLDER — e.g. All play stops immediately. 30-minute clear window required to resume.]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🏚️</span><span><strong style="color:var(--text);">Shortened Games</strong> — [PLACEHOLDER — e.g. Official after X completed innings.]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">❌</span><span><strong style="color:var(--text);">Cancellations</strong> — [PLACEHOLDER — e.g. Rescheduled if time permits, otherwise decided by tournament committee.]</span></div>
-                    <!-- ✏️ UPDATE EN: Replace [PLACEHOLDER] with official weather policy -->
+                    <div class="info-highlight">📢 Weather updates and any schedule changes will be communicated via this app's <strong style="color:var(--text);">announcement banner</strong> at the top of the screen — check back often.</div>
+                    <div class="info-rule"><span class="info-rule-icon">🌧️</span><span><strong style="color:var(--text);">Rain Delay</strong> — If only a few games are affected, they may be pushed to the next day at alternate available fields, subject to field availability.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon">⛈️</span><span><strong style="color:var(--text);">Severe Weather / Flooding</strong> — In extreme conditions, remaining games may be cancelled. The tournament director will assess the situation and announce the decision as quickly as possible.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon">📍</span><span><strong style="color:var(--text);">Field Changes</strong> — Any replacement field assignments will be confirmed by the committee and posted here immediately.</span></div>
                 </div>
                 <div class="lang-fr">
-                    <div class="info-highlight">⚠️ En cas de mauvais temps, le directeur du tournoi communiquera les mises à jour via [PLACEHOLDER — ex. les capitaines d'équipe / le système de son / cette application].</div>
-                    <div class="info-rule"><span class="info-rule-icon">🌧️</span><span><strong style="color:var(--text);">Délai pour pluie</strong> — [PLACEHOLDER — ex. Matchs suspendus après 30 minutes de délai. Le directeur évalue les conditions.]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">⚡</span><span><strong style="color:var(--text);">Foudre</strong> — [PLACEHOLDER — ex. Tout jeu s'arrête immédiatement. Fenêtre de 30 minutes sans activité requise.]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">🏚️</span><span><strong style="color:var(--text);">Matchs écourtés</strong> — [PLACEHOLDER — ex. Officiel après X manches complétées.]</span></div>
-                    <div class="info-rule"><span class="info-rule-icon">❌</span><span><strong style="color:var(--text);">Annulations</strong> — [PLACEHOLDER — ex. Reprogrammé si possible, sinon décidé par le comité.]</span></div>
-                    <!-- ✏️ UPDATE FR: Remplacer les [PLACEHOLDER] par la politique météo officielle -->
+                    <div class="info-highlight">📢 Les mises à jour météo et tout changement à l'horaire seront communiqués via le <strong style="color:var(--text);">bandeau d'annonce</strong> en haut de cette application — consultez-la régulièrement.</div>
+                    <div class="info-rule"><span class="info-rule-icon">🌧️</span><span><strong style="color:var(--text);">Délai pour pluie</strong> — Si seulement quelques matchs sont affectés, ils peuvent être reportés au lendemain sur d'autres terrains disponibles, selon la disponibilité des terrains.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon">⛈️</span><span><strong style="color:var(--text);">Mauvais temps sévère / Inondation</strong> — Dans les cas extrêmes, les matchs restants peuvent être annulés. Le directeur du tournoi évaluera la situation et communiquera sa décision le plus rapidement possible.</span></div>
+                    <div class="info-rule"><span class="info-rule-icon">📍</span><span><strong style="color:var(--text);">Changement de terrain</strong> — Toute attribution de terrain de remplacement sera confirmée par le comité et affichée ici immédiatement.</span></div>
+                </div>
+            </div>
+
+            <!-- FOOTER CREDIT -->
+            <div class="footer-credit">
+                <div class="lang-en">
+                    Proudly built by a <span class="telus-badge"><span class="telus-dot"></span>TELUS</span> team member<br>
+                    as part of the <strong style="color:var(--text2);">Days of Giving</strong> program 💚
+                </div>
+                <div class="lang-fr">
+                    Fièrement conçu par un membre de l'équipe <span class="telus-badge"><span class="telus-dot"></span>TELUS</span><br>
+                    dans le cadre des <strong style="color:var(--text2);">Journées de Générosité</strong> 💚
                 </div>
             </div>
 
@@ -634,6 +850,17 @@
                         <div class="success-toast" id="save-toast" data-key-text="save_success">✅ Score saved! Standings updated.</div>
                     </div>
                     <div id="admin-error" style="display:none;color:var(--red);font-size:0.78rem;font-weight:800;text-align:center;margin-top:10px;padding:10px;background:color-mix(in srgb,var(--red) 10%,transparent);border-radius:8px;border:1px solid color-mix(in srgb,var(--red) 30%,transparent);"></div>
+                </div>
+                <div class="admin-card">
+                    <h3>📢 Announcement Banner</h3>
+                    <p style="font-size:0.8rem;color:var(--text2);margin-bottom:13px;">Message shown at the top of the app for all users. Leave blank to show the default welcome message.</p>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-textarea" id="announcement-input" rows="3"
+                                  placeholder="e.g. ⚠️ Field 3 game at 2PM postponed — updates to follow"></textarea>
+                    </div>
+                    <button class="btn btn-gold" id="ann-save-btn" onclick="saveAnnouncement()">📢 Update Banner</button>
+                    <div class="success-toast" id="ann-toast">✅ Banner updated!</div>
                 </div>
                 <div class="admin-card">
                     <h3 id="lbl-quick-actions">⚙️ Quick Actions</h3>
@@ -708,6 +935,8 @@
             err_no_game:'⚠️ No game selected — choose a game from the dropdown first.',
             err_not_found:'⚠️ Game not found. Try refreshing the page.',
             err_save:'❌ Save failed. Check your connection and try again.',
+            ann_saved:'✅ Banner updated!',
+            ann_default:'🍀 Welcome to the ACP Shamrock Classic! Celebrating ~50 years of softball in Pincourt — good luck to all teams! ⚾',
         },
         fr: {
             tab_standings:'Classement', tab_bracket:'Tableau', tab_schedule:'Horaire', tab_info:'Info', tab_admin:'Admin',
@@ -742,6 +971,8 @@
             err_no_game:'⚠️ Aucun match sélectionné — choisissez un match d\'abord.',
             err_not_found:'⚠️ Match introuvable. Actualisez la page.',
             err_save:'❌ Échec de l\'enregistrement. Vérifiez votre connexion.',
+            ann_saved:'✅ Bandeau mis à jour !',
+            ann_default:'🍀 Bienvenue au Classique Shamrock de l\'ACP ! Près de 50 ans de softball à Pincourt — bonne chance à toutes les équipes ! ⚾',
         }
     };
     let lang  = localStorage.getItem('sc-lang')  || 'en';
@@ -906,6 +1137,7 @@
             if (state.settings.AdminPIN) adminPIN = state.settings.AdminPIN;
             updateHeader();
             if (dataChanged) render();
+            renderAnnouncement();
             const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             const bar  = '<span class="live-dot"></span> ' + (lang === 'fr' ? 'Mis à jour : ' : 'Last updated: ') + time;
             ['standings','bracket','schedule'].forEach(id => {
@@ -1225,6 +1457,8 @@
                 document.getElementById('pin-screen').style.display   = 'none';
                 document.getElementById('admin-panel').style.display  = 'block';
                 populateGameSelect();
+                const annInput = document.getElementById('announcement-input');
+                if (annInput) annInput.value = (state.settings.Announcement || '').trim();
             } else {
                 document.getElementById('pin-error').style.display = 'block';
                 document.getElementById('pin-input').value = '';
@@ -1306,6 +1540,57 @@
         document.getElementById('pin-input').value = '';
     }
 
+    // ==================== ANNOUNCEMENT ====================
+    function renderAnnouncement() {
+        const bar    = document.getElementById('announcement-bar');
+        const textEl = document.getElementById('announcement-text');
+        const msg    = (state.settings.Announcement || '').trim();
+        // If the admin pushed a new message, clear any previous dismiss so it re-appears
+        const prevMsg = sessionStorage.getItem('ann-last-msg') || '';
+        if (msg !== prevMsg) {
+            sessionStorage.removeItem('ann-dismissed');
+            sessionStorage.setItem('ann-last-msg', msg);
+        }
+        if (sessionStorage.getItem('ann-dismissed')) { bar.style.display = 'none'; return; }
+        textEl.textContent = msg || t('ann_default');
+        bar.style.display = '';
+    }
+    function dismissAnnouncement() {
+        document.getElementById('announcement-bar').style.display = 'none';
+        sessionStorage.setItem('ann-dismissed', '1');
+    }
+    async function saveAnnouncement() {
+        const msg  = (document.getElementById('announcement-input').value || '').trim();
+        const btn  = document.getElementById('ann-save-btn');
+        const toast = document.getElementById('ann-toast');
+        btn.disabled = true; btn.textContent = t('saving');
+        try {
+            const fd = new FormData();
+            fd.append('type', 'announcement');
+            fd.append('message', msg);
+            const res    = await fetch(scriptURL, { method:'POST', body:fd });
+            const result = await res.json();
+            if (result.result === 'success') {
+                state.settings.Announcement = msg;
+                lastDataHash = null;
+                sessionStorage.removeItem('ann-dismissed');
+                sessionStorage.setItem('ann-last-msg', msg);
+                renderAnnouncement();
+                toast.textContent = t('ann_saved');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            } else { showAdminError(t('err_save')); }
+        } catch(e) { showAdminError(t('err_save')); }
+        finally { btn.disabled = false; btn.textContent = '📢 Update Banner'; }
+    }
+
+    // ==================== ACCORDION ====================
+    function toggleAccordion(btn) {
+        const item = btn.closest('.accordion-item');
+        item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+    }
+
     // ==================== TABS ====================
     // Map panel IDs: admin tab → admin-panel-tab
     const panelMap = { standings:'standings-panel', bracket:'bracket-panel', schedule:'schedule-panel', info:'info-panel', admin:'admin-panel-tab' };
@@ -1376,6 +1661,7 @@
         document.body.classList.toggle('fr', lang === 'fr');
         localStorage.setItem('sc-lang', lang);
         if (state.teams.length) render();
+        renderAnnouncement(); // update default message language if no custom banner set
     }
     function switchLang() {
         lang = lang === 'en' ? 'fr' : 'en';
