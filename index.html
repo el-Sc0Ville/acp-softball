@@ -117,7 +117,8 @@
         }
         .toggle-btn:hover { border-color:var(--accent); color:var(--accent); }
         .toggle-btn:active { transform:scale(0.95); }
-        .header-right { display:flex; gap:6px; flex-shrink:0; align-items:center; }
+        .header-left  { display:flex; gap:6px; flex-shrink:0; align-items:center; min-width:88px; }
+        .header-right { display:flex; gap:6px; flex-shrink:0; align-items:center; min-width:88px; justify-content:flex-end; }
         @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
         .toggle-btn.spinning { animation:spin 0.7s linear; pointer-events:none; }
 
@@ -487,7 +488,9 @@
     <!-- ==================== HEADER ==================== -->
     <header class="app-header">
         <div class="header-row">
-            <button class="toggle-btn" id="lang-btn" onclick="switchLang()" aria-label="Switch language">EN</button>
+            <div class="header-left">
+                <button class="toggle-btn" id="lang-btn" onclick="switchLang()" aria-label="Switch language">EN</button>
+            </div>
             <div class="header-center">
                 <div class="header-badges">
                     <span class="acp-badge">ACP</span>
@@ -501,7 +504,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <button class="toggle-btn" id="refresh-btn" onclick="manualRefresh()" aria-label="Refresh data" style="font-size:1rem;">↻</button>
+                <button class="toggle-btn" id="refresh-btn" onclick="manualRefresh()" aria-label="Refresh data">↻</button>
                 <button class="toggle-btn" id="theme-btn" onclick="switchTheme()" aria-label="Toggle theme">☀️</button>
             </div>
         </div>
