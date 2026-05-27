@@ -91,7 +91,7 @@
             padding: 12px 14px 8px;
             gap: 8px;
         }
-        .header-center { flex:1; text-align:center; min-width:0; }
+        .header-center { text-align:center; width:100%; }
         .header-badges { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:4px; flex-wrap:nowrap; }
         .acp-badge { background:var(--gold); color:#1a1200; font-size:0.6rem; font-weight:900; padding:3px 7px; border-radius:5px; letter-spacing:1px; flex-shrink:0; }
         #tournament-name { font-size:1.15rem; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -117,8 +117,9 @@
         }
         .toggle-btn:hover { border-color:var(--accent); color:var(--accent); }
         .toggle-btn:active { transform:scale(0.95); }
-        .header-left  { display:flex; gap:6px; flex-shrink:0; align-items:center; min-width:88px; }
-        .header-right { display:flex; gap:6px; flex-shrink:0; align-items:center; min-width:88px; justify-content:flex-end; }
+        .header-controls { display:flex; align-items:center; justify-content:space-between; padding:4px 0 2px; }
+        .header-left  { display:flex; gap:6px; flex-shrink:0; align-items:center; }
+        .header-right { display:flex; gap:6px; flex-shrink:0; align-items:center; }
         @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
         .toggle-btn.spinning { animation:spin 0.7s linear; pointer-events:none; }
 
@@ -487,25 +488,25 @@
 
     <!-- ==================== HEADER ==================== -->
     <header class="app-header">
-        <div class="header-row">
+        <div class="header-controls">
             <div class="header-left">
                 <button class="toggle-btn" id="lang-btn" onclick="switchLang()" aria-label="Switch language">EN</button>
-            </div>
-            <div class="header-center">
-                <div class="header-badges">
-                    <span class="acp-badge">ACP</span>
-                    <h1 class="header" id="tournament-name">⚾ Shamrock Classic</h1>
-                    <span class="acp-badge">2026</span>
-                </div>
-                <div class="header-sub" id="tournament-sub">
-                    <span class="live-dot"></span>
-                    <a href="https://share.google/gTjwyYNfEEVWSNG3l" target="_blank" class="location-link">📍 Shamrock Park, Pincourt</a>
-                    &nbsp;·&nbsp; <span id="hdr-dates">May 28–31</span>
-                </div>
             </div>
             <div class="header-right">
                 <button class="toggle-btn" id="refresh-btn" onclick="manualRefresh()" aria-label="Refresh data">↻</button>
                 <button class="toggle-btn" id="theme-btn" onclick="switchTheme()" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="header-badges">
+                <span class="acp-badge">ACP</span>
+                <h1 class="header" id="tournament-name">⚾ Shamrock Classic</h1>
+                <span class="acp-badge">2026</span>
+            </div>
+            <div class="header-sub" id="tournament-sub">
+                <span class="live-dot"></span>
+                <a href="https://share.google/gTjwyYNfEEVWSNG3l" target="_blank" class="location-link">📍 Shamrock Park, Pincourt</a>
+                &nbsp;·&nbsp; <span id="hdr-dates">May 28–31</span>
             </div>
         </div>
     </header>
