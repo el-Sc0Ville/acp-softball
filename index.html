@@ -644,8 +644,8 @@
                         <div class="info-rule lang-en"><span class="info-rule-icon">10</span><span>Every player must bat. Up to <strong style="color:var(--text);">11 batters including a DH</strong> are permitted.</span></div>
                         <div class="info-rule lang-fr"><span class="info-rule-icon">10</span><span>Chaque joueur doit frapper. Jusqu'à <strong style="color:var(--text);">11 frappeurs, y compris un frappeur désigné</strong>, sont permis.</span></div>
 
-                        <div class="info-rule lang-en"><span class="info-rule-icon">27</span><span>To play in the playoffs, a player must have appeared in <strong style="color:var(--text);">at least one round-robin game with that same team</strong>. Spares or players from other teams <strong style="color:var(--red);">cannot join a lineup on Sunday</strong> if they did not play with that team on during the round-robin (Thrusday through Saturday). This rule ensures fair play and prevents teams from reinforcing their lineup for the elimination rounds.</span></div>
-                        <div class="info-rule lang-fr"><span class="info-rule-icon">27</span><span>Pour participer aux éliminatoires, un joueur doit avoir disputé <strong style="color:var(--text);">au moins un match préliminaire avec cette même équipe</strong>. Un remplaçant ou un joueur d'une autre équipe <strong style="color:var(--red);">ne peut pas rejoindre une équipe dimanche</strong> s'il n'a pas joué avec elle durant la ronde préliminaire (Jeudi à Samedi). Cette règle vise à assurer l'équité et à éviter que les équipes renforcent leur alignement pour les rondes éliminatoires.</span></div>
+                        <div class="info-rule lang-en"><span class="info-rule-icon">27</span><span>To play in the playoffs, a player must have appeared in <strong style="color:var(--text);">at least one round-robin game with that same team</strong>. Spares or players from other teams <strong style="color:var(--red);">cannot join a lineup on Sunday</strong> if they did not play with that team on Saturday. This rule ensures fair play and prevents teams from reinforcing their lineup for the elimination rounds.</span></div>
+                        <div class="info-rule lang-fr"><span class="info-rule-icon">27</span><span>Pour participer aux éliminatoires, un joueur doit avoir disputé <strong style="color:var(--text);">au moins un match préliminaire avec cette même équipe</strong>. Un remplaçant ou un joueur d'une autre équipe <strong style="color:var(--red);">ne peut pas rejoindre une équipe dimanche</strong> s'il n'a pas joué avec elle samedi. Cette règle vise à assurer l'équité et à éviter que les équipes renforcent leur alignement pour les rondes éliminatoires.</span></div>
 
                         <div class="info-rule lang-en"><span class="info-rule-icon">28</span><span>No player can be <strong style="color:var(--text);">"last batter"</strong> on 2 or more teams in the same division.</span></div>
                         <div class="info-rule lang-fr"><span class="info-rule-icon">28</span><span>Aucun joueur ne peut être <strong style="color:var(--text);">« dernier frappeur »</strong> dans deux équipes ou plus d'une même division.</span></div>
@@ -1508,6 +1508,15 @@
         const map = { Final: t('st_final'), Live: t('st_live'), Upcoming: t('st_upcoming'), Postponed: t('st_postponed') };
         return map[status] || status;
     }
+    function parseTimeMinutes(timeStr) {
+        const m = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!m) return 0;
+        let h = parseInt(m[1]), min = parseInt(m[2]);
+        const isPM = m[3].toUpperCase() === 'PM';
+        if (isPM && h !== 12) h += 12;
+        if (!isPM && h === 12) h = 0;
+        return h * 60 + min;
+    }
     function renderSchedule() {
         const days = {};
         state.games.forEach(g => {
@@ -1516,6 +1525,7 @@
         });
         let html = '';
         Object.keys(days).forEach(day => {
+            days[day].sort((a, b) => parseTimeMinutes(a.time) - parseTimeMinutes(b.time));
             html += '<div class="day-group"><div class="day-header">📅 ' + formatDayDisplay(day) + '</div>';
             days[day].forEach(g => {
                 const homeName  = getTeamName(g.home);
