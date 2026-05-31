@@ -1219,12 +1219,26 @@
             else if (g.awayScore > g.homeScore) { a.w++; a.pts += 2; h.l++; }
             else                                { h.tie++; h.pts++; a.tie++; a.pts++; }
         });
-        return Object.values(stats).sort((a,b) => {
+        const result = Object.values(stats).sort((a,b) => {
             if (b.pts !== a.pts) return b.pts - a.pts;
             const dA = a.rf - a.ra, dB = b.rf - b.ra;
             if (dB !== dA) return dB - dA;
             return b.rf - a.rf;
         });
+        // Allow manual seed override from Settings (e.g. coin flip tiebreakers)
+        // Key: SeedOrder_B or SeedOrder_C  Value: comma-separated team IDs in seed order
+        const override = state.settings['SeedOrder_' + div];
+        if (override) {
+            const ids = override.split(',').map(s => Number(s.trim())).filter(Boolean);
+            result.sort((a, b) => {
+                const ai = ids.indexOf(a.id), bi = ids.indexOf(b.id);
+                if (ai !== -1 && bi !== -1) return ai - bi;
+                if (ai !== -1) return -1;
+                if (bi !== -1) return 1;
+                return 0;
+            });
+        }
+        return result;
     }
     function calcStreaks() {
         const streaks = {};
