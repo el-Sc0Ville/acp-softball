@@ -1429,9 +1429,7 @@
         const standings    = calcStandingsByDivision(div);
         const MAX_RR_GAMES = 3;
         const allRRDone    = standings.length > 0 && standings.every(tm => tm.gp >= MAX_RR_GAMES);
-        // Only reveal seeds after round-robin is complete
-        function s(n) { return allRRDone ? (standings[n-1] || null) : null; }
-        function nm(team) { return team ? team.name : 'TBD'; }
+        function nm(team)  { return team ? team.name : 'TBD'; }
 
         let semi1 = null, semi2 = null, champ = null;
         state.games.forEach(g => {
@@ -1442,20 +1440,60 @@
         function played(g) { return g && g.status === 'Final'; }
         function live(g)   { return g && g.status === 'Live'; }
         function active(g) { return played(g) || live(g); }
-        function seedScore(game, seedTeam) {
-            if (!game || !seedTeam) return null;
-            return game.home === seedTeam.id ? game.homeScore : game.awayScore;
+
+        // Look up a team object by ID
+        function teamById(id) {
+            if (!id || id === 0) return null;
+            return state.teams.find(t => t.id === id) || null;
         }
-        function seedWon(game, seedTeam) {
-            if (!game || !seedTeam) return false;
-            const mine = game.home === seedTeam.id ? game.homeScore : game.awayScore;
-            const opp  = game.home === seedTeam.id ? game.awayScore : game.homeScore;
+        // Standings rank (1-based) — used for ordering rows and seed labels
+        function rankOf(team) {
+            if (!team || !allRRDone) return 99;
+            const idx = standings.findIndex(st => st.id === team.id);
+            return idx >= 0 ? idx + 1 : 99;
+        }
+        function rankLabel(n) { return n===1?'1st':n===2?'2nd':n===3?'3rd':n===4?'4th':n+'th'; }
+
+        // For a semi-final game, return [topTeam, bottomTeam] using actual game IDs when set,
+        // ordering by standings rank so the higher seed is always on top.
+        // Falls back to standings seeds when no teams are set yet.
+        function semiTeams(g, fallbackHigh, fallbackLow) {
+            if (g && g.home > 0 && g.away > 0) {
+                const tH = teamById(g.home), tA = teamById(g.away);
+                if (tH && tA) return rankOf(tH) <= rankOf(tA) ? [tH, tA] : [tA, tH];
+            }
+            return [fallbackHigh || null, fallbackLow || null];
+        }
+        // Score for a specific team in a game, matched by team ID
+        function scoreFor(g, team) {
+            if (!g || !team) return null;
+            if (g.home === team.id) return g.homeScore;
+            if (g.away === team.id) return g.awayScore;
+            return null;
+        }
+        // Did this team win?
+        function wonGame(g, team) {
+            if (!g || !team) return false;
+            const mine = scoreFor(g, team);
+            if (mine === null) return false;
+            const opp = g.home === team.id ? g.awayScore : g.homeScore;
             return mine >= opp;
         }
+
+        const s = n => allRRDone ? (standings[n-1] || null) : null;
+        const [s1Top, s1Bot] = semiTeams(semi1, s(1), s(4));
+        const [s2Top, s2Bot] = semiTeams(semi2, s(2), s(3));
+
+        // Championship: derive from semi winners; override with actual game teams if set
         let w1 = null, w2 = null, champion = null;
-        if (played(semi1) && s(1) && s(4)) w1 = seedWon(semi1, s(1)) ? s(1) : s(4);
-        if (played(semi2) && s(2) && s(3)) w2 = seedWon(semi2, s(2)) ? s(2) : s(3);
-        if (played(champ) && w1 && w2)     champion = seedWon(champ, w1) ? w1 : w2;
+        if (played(semi1) && s1Top && s1Bot) w1 = wonGame(semi1, s1Top) ? s1Top : s1Bot;
+        if (played(semi2) && s2Top && s2Bot) w2 = wonGame(semi2, s2Top) ? s2Top : s2Bot;
+        let champTop = w1, champBot = w2;
+        if (champ && champ.home > 0 && champ.away > 0) {
+            const cH = teamById(champ.home), cA = teamById(champ.away);
+            if (cH && cA) { champTop = cH; champBot = cA; }
+        }
+        if (played(champ) && champTop && champBot) champion = wonGame(champ, champTop) ? champTop : champBot;
 
         function teamRow(seedLabel, team, score, isWinner) {
             return '<div class="bracket-team ' + (isWinner ? 'bracket-winner' : '') + '">'
@@ -1476,14 +1514,14 @@
             +     '<div class="bracket-game-card ' + (live(semi1) ? 'bracket-live' : '') + '">'
             +       '<div class="bracket-round-label">' + rl(semi1, t('semi_final')) + '</div>'
             +       '<div class="bracket-matchup">'
-            +         teamRow('1st', s(1), active(semi1) ? seedScore(semi1,s(1)) : null, played(semi1) && seedWon(semi1,s(1)))
-            +         teamRow('4th', s(4), active(semi1) ? seedScore(semi1,s(4)) : null, played(semi1) && seedWon(semi1,s(4)))
+            +         teamRow(rankLabel(rankOf(s1Top)), s1Top, active(semi1) ? scoreFor(semi1,s1Top) : null, played(semi1) && wonGame(semi1,s1Top))
+            +         teamRow(rankLabel(rankOf(s1Bot)), s1Bot, active(semi1) ? scoreFor(semi1,s1Bot) : null, played(semi1) && wonGame(semi1,s1Bot))
             +       '</div></div>'
             +     '<div class="bracket-game-card ' + (live(semi2) ? 'bracket-live' : '') + '">'
             +       '<div class="bracket-round-label">' + rl(semi2, t('semi_final')) + '</div>'
             +       '<div class="bracket-matchup">'
-            +         teamRow('2nd', s(2), active(semi2) ? seedScore(semi2,s(2)) : null, played(semi2) && seedWon(semi2,s(2)))
-            +         teamRow('3rd', s(3), active(semi2) ? seedScore(semi2,s(3)) : null, played(semi2) && seedWon(semi2,s(3)))
+            +         teamRow(rankLabel(rankOf(s2Top)), s2Top, active(semi2) ? scoreFor(semi2,s2Top) : null, played(semi2) && wonGame(semi2,s2Top))
+            +         teamRow(rankLabel(rankOf(s2Bot)), s2Bot, active(semi2) ? scoreFor(semi2,s2Bot) : null, played(semi2) && wonGame(semi2,s2Bot))
             +       '</div></div>'
             +   '</div>'
             +   '<div class="bracket-connector">→</div>'
@@ -1491,8 +1529,8 @@
             +     '<div class="bracket-game-card bracket-final-card ' + (live(champ) ? 'bracket-live' : '') + '">'
             +       '<div class="bracket-round-label">' + (played(champ) ? t('champ_done') : live(champ) ? '🔴 ' + t('championship') : '🏆 ' + t('championship')) + '</div>'
             +       '<div class="bracket-matchup">'
-            +         teamRow('W1', w1, active(champ) ? seedScore(champ,w1) : null, played(champ) && seedWon(champ,w1))
-            +         teamRow('W2', w2, active(champ) ? seedScore(champ,w2) : null, played(champ) && seedWon(champ,w2))
+            +         teamRow(w1 ? rankLabel(rankOf(w1)) : 'W1', champTop, active(champ) ? scoreFor(champ,champTop) : null, played(champ) && wonGame(champ,champTop))
+            +         teamRow(w2 ? rankLabel(rankOf(w2)) : 'W2', champBot, active(champ) ? scoreFor(champ,champBot) : null, played(champ) && wonGame(champ,champBot))
             +       '</div>' + champBox
             +     '</div>'
             +   '</div>'
