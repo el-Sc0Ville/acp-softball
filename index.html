@@ -1207,6 +1207,7 @@
         });
         state.games.forEach(g => {
             if (g.status !== 'Final') return;
+            if (g.label) return;  // exclude playoff games — only round-robin counts toward standings
             if (!g.home || !g.away || g.home === 0 || g.away === 0) return;
             if (!divIds[g.home] || !divIds[g.away]) return;
             const h = stats[g.home], a = stats[g.away];
