@@ -216,6 +216,52 @@
         .venue-meta { font-size:0.72rem; color:var(--text3); margin-top:2px; }
         .venue-go { font-size:0.68rem; font-weight:800; padding:5px 10px; border-radius:7px; background:color-mix(in srgb,var(--accent) 14%,transparent); border:1px solid color-mix(in srgb,var(--accent) 35%,transparent); color:var(--accent); text-decoration:none; white-space:nowrap; flex-shrink:0; }
         .venue-go:active { opacity:0.7; }
+
+        /* ============================================================
+           TEAM DETAIL SHEET
+        ============================================================ */
+        .sheet-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;
+            opacity:0; pointer-events:none; transition:opacity 0.22s; backdrop-filter:blur(2px); }
+        .sheet-backdrop.open { opacity:1; pointer-events:auto; }
+        .team-sheet { position:fixed; left:0; right:0; bottom:0; z-index:201;
+            background:var(--bg); border-top-left-radius:20px; border-top-right-radius:20px;
+            border-top:1px solid var(--border); box-shadow:0 -8px 40px var(--shadow);
+            max-height:82vh; display:flex; flex-direction:column;
+            transform:translateY(101%); transition:transform 0.28s cubic-bezier(.32,.72,0,1);
+            padding-bottom:env(safe-area-inset-bottom,0); }
+        .team-sheet.open { transform:translateY(0); }
+        .sheet-grip { width:38px; height:4px; border-radius:2px; background:var(--text3);
+            opacity:0.4; margin:9px auto 4px; flex-shrink:0; }
+        .sheet-head { padding:8px 18px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
+        .sheet-title-row { display:flex; align-items:center; gap:9px; margin-bottom:10px; }
+        .sheet-team-name { font-size:1.1rem; font-weight:800; color:var(--text); flex:1;
+            overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .sheet-close { background:none; border:none; color:var(--text3); font-size:1.1rem;
+            cursor:pointer; padding:2px 4px; flex-shrink:0; }
+        .sheet-stats { display:flex; gap:7px; }
+        .sheet-stat { flex:1; background:color-mix(in srgb,var(--text) 5%,transparent);
+            border-radius:9px; padding:7px 4px; text-align:center; }
+        .sheet-stat-val { font-size:1rem; font-weight:800; color:var(--text); line-height:1.3; }
+        .sheet-stat-lbl { font-size:0.58rem; font-weight:700; color:var(--text3);
+            text-transform:uppercase; letter-spacing:0.06em; margin-top:1px; }
+        .sheet-body { overflow-y:auto; padding:12px 18px 20px; -webkit-overflow-scrolling:touch; }
+        .sheet-sec { font-size:0.62rem; font-weight:800; color:var(--text3); text-transform:uppercase;
+            letter-spacing:0.08em; margin:4px 0 8px; }
+        .tg-row { display:flex; align-items:center; gap:10px; padding:9px 0;
+            border-bottom:1px solid color-mix(in srgb,var(--text) 5%,transparent); }
+        .tg-row:last-child { border-bottom:none; }
+        .tg-when { width:74px; flex-shrink:0; font-size:0.66rem; color:var(--text3); line-height:1.35; }
+        .tg-opp { flex:1; min-width:0; font-size:0.84rem; color:var(--text); font-weight:600;
+            overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .tg-opp small { color:var(--text3); font-weight:600; }
+        .tg-res { flex-shrink:0; font-size:0.8rem; font-weight:800; padding:2px 8px; border-radius:6px; }
+        .tg-w { background:color-mix(in srgb,var(--accent) 15%,transparent); color:var(--accent); }
+        .tg-l { background:color-mix(in srgb,var(--red) 13%,transparent); color:var(--red); }
+        .tg-t { background:color-mix(in srgb,var(--text) 8%,transparent); color:var(--text2); }
+        .tg-up { background:color-mix(in srgb,var(--gold) 13%,transparent); color:var(--gold);
+            font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; }
+        .team-name-cell { text-decoration:underline; text-decoration-color:color-mix(in srgb,var(--text) 18%,transparent);
+            text-underline-offset:3px; }
         .wx-badge { font-size:0.58rem; font-weight:800; padding:2px 6px; border-radius:4px; flex-shrink:0; background:color-mix(in srgb, var(--blue) 10%, transparent); color:var(--blue); border:1px solid color-mix(in srgb, var(--blue) 25%, transparent); white-space:nowrap; display:inline-flex; align-items:center; gap:2px; }
 
         /* ============================================================
@@ -828,11 +874,11 @@
             <div class="footer-credit">
                 <div class="lang-en">
                     Proudly built by a <span class="telus-badge"><span class="telus-dot"></span>TELUS</span> team member<br>
-                    as part of the <strong style="color:var(--text2);">Days of Giving</strong> program 💚
+                    as part of the <strong style="color:var(--text2);">Days of Giving</strong> program 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-14</div>
                 </div>
                 <div class="lang-fr">
                     Fièrement conçu par un membre de l'équipe <span class="telus-badge"><span class="telus-dot"></span>TELUS</span><br>
-                    dans le cadre des <strong style="color:var(--text2);">Journées de Générosité</strong> 💚
+                    dans le cadre des <strong style="color:var(--text2);">Journées de Générosité</strong> 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-14</div>
                 </div>
             </div>
 
@@ -916,6 +962,21 @@
 
     </main><!-- end .app-content -->
 
+    <!-- ==================== TEAM DETAIL SHEET ==================== -->
+    <div class="sheet-backdrop" id="sheet-backdrop" onclick="closeTeam()"></div>
+    <div class="team-sheet" id="team-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-team-name">
+        <div class="sheet-grip"></div>
+        <div class="sheet-head">
+            <div class="sheet-title-row">
+                <span class="div-badge" id="sheet-div-badge"></span>
+                <span class="sheet-team-name" id="sheet-team-name"></span>
+                <button class="sheet-close" onclick="closeTeam()" aria-label="Close">✕</button>
+            </div>
+            <div class="sheet-stats" id="sheet-stats"></div>
+        </div>
+        <div class="sheet-body" id="sheet-body"></div>
+    </div>
+
     <!-- ==================== BOTTOM TAB BAR ==================== -->
     <nav class="tab-bar" role="tablist" aria-label="Tournament sections">
         <button class="tab-btn active" role="tab" aria-selected="true"  id="tab-standings" onclick="switchTab('standings')">
@@ -955,7 +1016,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Team', col_gp:'GP', col_w:'W', col_l:'L', col_t:'T', col_pts:'Pts',
             loading:'Loading... ⚾', no_games:'No games played yet',
-            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', lbl_today:"Today's Games", park_fmt:'{} Park', lbl_directions:'Directions →', venues_title:'📍 Where We Play',
+            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', lbl_today:"Today's Games", lbl_not_started:'Standings appear once the first games are played', col_rec:'Record', col_diff:'Diff', lbl_their_games:'All Games', lbl_vs:'vs', lbl_at:'@', park_fmt:'{} Park', lbl_directions:'Directions →', venues_title:'📍 Where We Play',
             st_final:'Final', st_live:'Live', st_upcoming:'Upcoming', st_postponed:'Postponed',
             bracket_tbd:'Bracket populates once round-robin games are played 🏟️',
             semi_final:'Semi-Final', championship:'Championship',
@@ -991,7 +1052,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Équipe', col_gp:'MJ', col_w:'V', col_l:'D', col_t:'N', col_pts:'Pts',
             loading:'Chargement... ⚾', no_games:'Aucun match joué',
-            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', lbl_today:"Matchs du jour", park_fmt:'Parc {}', lbl_directions:'Itinéraire →', venues_title:'📍 Où nous jouons',
+            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', lbl_today:"Matchs du jour", lbl_not_started:'Le classement apparaîtra après les premiers matchs', col_rec:'Fiche', col_diff:'Diff', lbl_their_games:'Tous les matchs', lbl_vs:'c.', lbl_at:'@', park_fmt:'Parc {}', lbl_directions:'Itinéraire →', venues_title:'📍 Où nous jouons',
             st_final:'Final', st_live:'En direct', st_upcoming:'À venir', st_postponed:'Reporté',
             bracket_tbd:'Le tableau sera disponible après les matchs préliminaires 🏟️',
             semi_final:'Demi-finale', championship:'Finale',
@@ -1324,8 +1385,11 @@
         const allRRDone    = standings.length > 0 && standings.every(tm => tm.gp >= 3);
         const legend = document.getElementById('standings-legend');
         if (legend) {
-            legend.innerHTML = '<div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>' + t('lbl_playoff') + '</div>'
-                + (allRRDone ? '<div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>' + t('lbl_eliminated') + '</div>' : '');
+            const anyResults = standings.some(tm => tm.gp > 0);
+            legend.innerHTML = !anyResults
+                ? '<div class="legend-item" style="color:var(--text3);">' + t('lbl_not_started') + '</div>'
+                : '<div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>' + t('lbl_playoff') + '</div>'
+                  + (allRRDone ? '<div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>' + t('lbl_eliminated') + '</div>' : '');
         }
         // Update table headers for current language
         ['b','c'].forEach(d => {
@@ -1336,18 +1400,22 @@
             const ti = document.getElementById('th-t-' + d);     if (ti) ti.textContent = t('col_t');
             const pt = document.getElementById('th-pts-' + d);   if (pt) pt.textContent = t('col_pts');
         });
+        // Nobody is ranked until there is something to rank on. Before the first result
+        // the order is arbitrary, so medals and playoff shading would be meaningless.
+        const anyPlayed = standings.some(tm => tm.gp > 0);
         let html = '';
         standings.forEach((team, i) => {
             const rank      = i + 1;
             const diff      = team.rf - team.ra;
             const diffClass = diff > 0 ? 'diff-positive' : diff < 0 ? 'diff-negative' : 'diff-zero';
             const diffStr   = diff > 0 ? '+' + diff : '' + diff;
-            const rankClass = ['','rank-1','rank-2','rank-3','rank-4'][rank] || '';
-            const rankDisp  = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank === 4 ? '🎖️' : rank;
+            const rankClass = anyPlayed ? (['','rank-1','rank-2','rank-3','rank-4'][rank] || '') : '';
+            const rankDisp  = !anyPlayed ? '<span style="color:var(--text3);">–</span>'
+                            : rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank === 4 ? '🎖️' : rank;
             const streak    = streaks[team.id] || 0;
             const badge     = streak >= 2 ? '<span class="streak-badge">🔥</span>' : streak <= -2 ? '<span class="streak-badge">🥶</span>' : '';
-            const rowClass  = rank <= playoffSpots ? 'playoff-spot' : allRRDone ? 'eliminated' : '';
-            html += '<tr class="' + rowClass + ' ' + rankClass + '">'
+            const rowClass  = !anyPlayed ? '' : rank <= playoffSpots ? 'playoff-spot' : allRRDone ? 'eliminated' : '';
+            html += '<tr class="' + rowClass + ' ' + rankClass + '" onclick="openTeam(' + team.id + ')" style="cursor:pointer;">'
                 + '<td><span class="rank-num">' + rankDisp + '</span></td>'
                 + '<td class="team-name-cell">' + team.name + badge + '</td>'
                 + '<td>' + team.gp + '</td><td>' + team.w + '</td><td>' + team.l + '</td><td>' + team.tie + '</td>'
@@ -1396,7 +1464,23 @@
         const todayStr = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })
                                    .replace(/,\s*\d{4}$/, '');
 
-        const todayGames = state.games.filter(g => g.home > 0 && g.away > 0 && g.day === todayStr);
+        let todayGames = state.games.filter(g => g.home > 0 && g.away > 0 && g.day === todayStr);
+        let showingToday = todayGames.length > 0;
+
+        // Before the tournament starts (or on a rest day) fall forward to the next day
+        // that actually has games, so this strip is never empty and useless.
+        if (!showingToday) {
+            const todayISO = new Date().toISOString().slice(0,10);
+            const upcoming = state.games
+                .filter(g => g.home > 0 && g.away > 0)
+                .map(g => ({ g, iso: dayToISO(g.day) }))
+                .filter(x => x.iso && x.iso >= todayISO)
+                .sort((a,b) => a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0);
+            if (upcoming.length) {
+                const nextDay = upcoming[0].g.day;
+                todayGames = state.games.filter(g => g.home > 0 && g.away > 0 && g.day === nextDay);
+            }
+        }
 
         if (todayGames.length > 0) {
             // ---- Horizontal scroll: all of today's games ----
@@ -1404,7 +1488,11 @@
             todaySection.style.display = 'block';
 
             const hasLive = todayGames.some(g => g.status === 'Live');
-            todayLabel.textContent = hasLive ? t('live_now') : t('lbl_today');
+            todayLabel.textContent = hasLive       ? t('live_now')
+                                   : showingToday  ? t('lbl_today')
+                                   : formatDayDisplay(todayGames[0].day);
+            // sort the strip chronologically
+            todayGames = todayGames.slice().sort((a,b) => parseTimeMinutes(a.time) - parseTimeMinutes(b.time));
 
             todayScroll.innerHTML = todayGames.map(g => {
                 const isLive  = g.status === 'Live';
@@ -1482,6 +1570,74 @@
             }
         }
     }
+
+    // ==================== TEAM DETAIL SHEET ====================
+    let openTeamId = null;
+    function openTeam(id) {
+        const team = state.teams.find(tm => tm.id === id);
+        if (!team) return;
+        openTeamId = id;
+        const st = calcStandingsByDivision(team.division).find(s => s.id === id)
+                || { gp:0, w:0, l:0, tie:0, rf:0, ra:0, pts:0 };
+        const diff = st.rf - st.ra;
+
+        document.getElementById('sheet-team-name').textContent = team.name;
+        const db = document.getElementById('sheet-div-badge');
+        db.className = 'div-badge div-' + team.division.toLowerCase();
+        db.textContent = team.division;
+
+        document.getElementById('sheet-stats').innerHTML =
+            [[st.w + '-' + st.l + '-' + st.tie, t('col_rec')],
+             [st.pts,                            t('col_pts')],
+             [(diff > 0 ? '+' : '') + diff,      t('col_diff')],
+             [st.gp,                             t('col_gp')]]
+            .map(([v,l]) => '<div class="sheet-stat"><div class="sheet-stat-val">' + v +
+                            '</div><div class="sheet-stat-lbl">' + l + '</div></div>').join('');
+
+        // every game this team appears in, in chronological order
+        const mine = state.games
+            .filter(g => g.home === id || g.away === id)
+            .map(g => ({ g, iso: dayToISO(g.day) || '', mins: parseTimeMinutes(g.time) }))
+            .sort((a,b) => a.iso === b.iso ? a.mins - b.mins : (a.iso < b.iso ? -1 : 1));
+
+        const body = document.getElementById('sheet-body');
+        if (!mine.length) {
+            body.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);">' + t('no_games') + '</div>';
+        } else {
+            body.innerHTML = '<div class="sheet-sec">' + t('lbl_their_games') + '</div>'
+                + mine.map(({g}) => {
+                    const isHome = g.home === id;
+                    const oppId  = isHome ? g.away : g.home;
+                    const oppNm  = oppId ? getTeamName(oppId) : 'TBD';
+                    const mine_  = isHome ? g.homeScore : g.awayScore;
+                    const theirs = isHome ? g.awayScore : g.homeScore;
+                    let res;
+                    if (g.status === 'Final') {
+                        const cls = mine_ > theirs ? 'tg-w' : mine_ < theirs ? 'tg-l' : 'tg-t';
+                        res = '<span class="tg-res ' + cls + '">' + mine_ + '–' + theirs + '</span>';
+                    } else if (g.status === 'Live') {
+                        res = '<span class="tg-res tg-l">' + mine_ + '–' + theirs + '</span>';
+                    } else {
+                        res = '<span class="tg-res tg-up">' + t('st_upcoming') + '</span>';
+                    }
+                    const wx = makeWxBadge(g);
+                    return '<div class="tg-row">'
+                        + '<div class="tg-when">' + formatDayDisplay(g.day) + '<br>' + formatTimeDisplay(g.time) + '</div>'
+                        + '<div class="tg-opp">' + (g.label ? '<small>' + g.label + '</small><br>' : '')
+                        +   '<small>' + (isHome ? t('lbl_vs') : t('lbl_at')) + '</small> ' + oppNm
+                        +   '<br><small>' + g.field + (wx ? ' ' : '') + '</small>' + wx
+                        + '</div>' + res + '</div>';
+                }).join('');
+        }
+        document.getElementById('sheet-backdrop').classList.add('open');
+        document.getElementById('team-sheet').classList.add('open');
+    }
+    function closeTeam() {
+        openTeamId = null;
+        document.getElementById('sheet-backdrop').classList.remove('open');
+        document.getElementById('team-sheet').classList.remove('open');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTeam(); });
 
     // ==================== VENUES ====================
     // Groups the fields in the schedule by park (first word of the field name) and
@@ -1937,6 +2093,7 @@
     // Weather needs the game dates, so it kicks off once the first data load lands
     loadState().then(loadWeatherHourly);
     setInterval(loadState, 15000);
+    console.log('%c ACP Softball Classic — build 2026-08-14 ','background:#4B178A;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700');
 </script>
 </body>
 </html>
