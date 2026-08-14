@@ -6,12 +6,12 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="ACP Shamrock Classic 2026 — Live standings, schedule, and bracket for the Pincourt baseball tournament.">
+    <meta name="description" content="ACP Softball Classic — Summer Edition 2026. Live standings, schedule, and bracket for the Pincourt softball tournament.">
     <meta name="theme-color" content="#0d1f0d" id="theme-meta">
-    <meta property="og:title" content="ACP Shamrock Classic ⚾ 2026">
-    <meta property="og:description" content="Live standings, schedule & bracket · Shamrock Park, Pincourt · May 28–31">
+    <meta property="og:title" content="ACP Softball Classic ⚾ Summer Edition 2026">
+    <meta property="og:description" content="Live standings, schedule &amp; bracket · Shamrock Park &amp; Olympic Park, Pincourt · August 20–23">
     <meta property="og:type" content="website">
-    <title>ACP Shamrock Classic ⚾</title>
+    <title>ACP Softball Classic ⚾ Summer Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -206,7 +206,16 @@
         .div-badge { font-size:0.58rem; font-weight:900; padding:2px 6px; border-radius:4px; letter-spacing:1px; flex-shrink:0; }
         .div-b { background:color-mix(in srgb, var(--blue) 15%, transparent); color:var(--blue); border:1px solid color-mix(in srgb, var(--blue) 30%, transparent); }
         .div-c { background:color-mix(in srgb, var(--gold) 15%, transparent); color:var(--gold); border:1px solid color-mix(in srgb, var(--gold) 30%, transparent); }
-        .field-badge { font-size:0.58rem; font-weight:800; padding:2px 6px; border-radius:4px; flex-shrink:0; background:color-mix(in srgb, var(--text) 6%, transparent); color:var(--text2); border:1px solid var(--border); white-space:nowrap; }
+        .field-badge { font-size:0.58rem; font-weight:800; padding:2px 6px; border-radius:4px; flex-shrink:0; background:color-mix(in srgb, var(--text) 6%, transparent); color:var(--text2); border:1px solid var(--border); white-space:nowrap; display:inline-block; }
+        a.field-badge-link { text-decoration:none; cursor:pointer; }
+        a.field-badge-link:active { background:color-mix(in srgb, var(--accent) 18%, transparent); border-color:var(--accent); color:var(--accent); }
+        .venue-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid color-mix(in srgb,var(--text) 5%,transparent); }
+        .venue-row:last-child { border-bottom:none; padding-bottom:0; }
+        .venue-info { flex:1; min-width:0; }
+        .venue-name { font-size:0.88rem; font-weight:700; color:var(--text); }
+        .venue-meta { font-size:0.72rem; color:var(--text3); margin-top:2px; }
+        .venue-go { font-size:0.68rem; font-weight:800; padding:5px 10px; border-radius:7px; background:color-mix(in srgb,var(--accent) 14%,transparent); border:1px solid color-mix(in srgb,var(--accent) 35%,transparent); color:var(--accent); text-decoration:none; white-space:nowrap; flex-shrink:0; }
+        .venue-go:active { opacity:0.7; }
         .wx-badge { font-size:0.58rem; font-weight:800; padding:2px 6px; border-radius:4px; flex-shrink:0; background:color-mix(in srgb, var(--blue) 10%, transparent); color:var(--blue); border:1px solid color-mix(in srgb, var(--blue) 25%, transparent); white-space:nowrap; display:inline-flex; align-items:center; gap:2px; }
 
         /* ============================================================
@@ -479,7 +488,7 @@
             .bracket-connector { transform:rotate(90deg); }
             .bracket-final-col { width:100%; }
             .weather-grid { grid-template-columns:repeat(2,1fr); }
-            .header h1 { font-size:1rem; }
+            #tournament-name { font-size:1rem; }
         }
     </style>
 </head>
@@ -500,13 +509,13 @@
         <div class="header-center">
             <div class="header-badges">
                 <span class="acp-badge">ACP</span>
-                <h1 class="header" id="tournament-name">⚾ Shamrock Classic</h1>
+                <h1 class="header" id="tournament-name">⚾ Softball Classic</h1>
                 <span class="acp-badge">2026</span>
             </div>
             <div class="header-sub" id="tournament-sub">
                 <span class="live-dot"></span>
-                <a href="https://share.google/gTjwyYNfEEVWSNG3l" target="_blank" class="location-link">📍 Shamrock Park, Pincourt</a>
-                &nbsp;·&nbsp; <span id="hdr-dates">May 28–31</span>
+                <a href="https://share.google/gTjwyYNfEEVWSNG3l" target="_blank" class="location-link">📍 Shamrock &amp; Olympic Park, Pincourt</a>
+                &nbsp;·&nbsp; <span id="hdr-dates">Aug 20–23</span>
             </div>
         </div>
     </header>
@@ -582,6 +591,9 @@
         <!-- INFO -->
         <div id="info-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-info">
 
+            <div class="section-title" id="lbl-venues-title">📍 Where We Play</div>
+            <div class="info-card" id="venues-card" style="margin-bottom:16px;"></div>
+
             <div class="section-title" id="lbl-forecast-title">🌤️ Game Day Forecast</div>
             <div id="weather-body" style="margin-bottom:16px;">
                 <div style="text-align:center;padding:20px;color:var(--text3);">Loading forecast... 🌤️</div>
@@ -592,13 +604,13 @@
             <div class="info-card">
                 <div class="lang-en">
                     <p>Action Comité Pincourt (ACP) is a volunteer committee dedicated to organizing community events and fundraising activities for the residents of Pincourt, Quebec.</p>
-                    <p>The Shamrock Classic is one of ACP's signature annual events — bringing teams together for a weekend of competitive softball, community spirit, and good fun in support of the town.</p>
+                    <p>The ACP Softball Classic is one of ACP's signature annual events — bringing teams together for a weekend of competitive softball, community spirit, and good fun in support of the town. The Summer Edition runs across Shamrock Park and Olympic Park.</p>
                     <p>All proceeds go directly toward community initiatives in Pincourt. Thank you to every player, volunteer, and sponsor who makes this possible! 🍀</p>
                     <!-- ✏️ UPDATE EN: Replace with final ACP description -->
                 </div>
                 <div class="lang-fr">
                     <p>L'Action Comité Pincourt (ACP) est un comité bénévole dont la mission est d'organiser des événements communautaires et des activités de collecte de fonds pour les résidents de Pincourt, au Québec.</p>
-                    <p>Le Classique Shamrock est l'un des événements phares annuels de l'ACP — réunissant des équipes pour une fin de semaine de softball compétitif, de solidarité communautaire et de bonne humeur au profit de la ville.</p>
+                    <p>Le Classique de softball de l'ACP est l'un des événements phares annuels de l'ACP — réunissant des équipes pour une fin de semaine de softball compétitif, de solidarité communautaire et de bonne humeur au profit de la ville. L'Édition estivale se déroule au parc Shamrock et au parc Olympique.</p>
                     <p>Tous les profits vont directement aux initiatives communautaires de Pincourt. Merci à chaque joueur, bénévole et commanditaire qui rend cela possible ! 🍀</p>
                     <!-- ✏️ UPDATE FR: Remplacer par la description finale de l'ACP -->
                 </div>
@@ -937,13 +949,13 @@
     const T = {
         en: {
             tab_standings:'Standings', tab_bracket:'Bracket', tab_schedule:'Schedule', tab_info:'Info', tab_admin:'Admin',
-            hdr_dates:'May 28–31',
+            hdr_dates:'Aug 20–23',
             lbl_progress:'Tournament Progress', lbl_games:'games',
             lbl_playoff:'Playoff Spot (Top 4)', lbl_eliminated:'Eliminated',
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Team', col_gp:'GP', col_w:'W', col_l:'L', col_t:'T', col_pts:'Pts',
             loading:'Loading... ⚾', no_games:'No games played yet',
-            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', lbl_today:"Today's Games",
+            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', lbl_today:"Today's Games", park_fmt:'{} Park', lbl_directions:'Directions →', venues_title:'📍 Where We Play',
             st_final:'Final', st_live:'Live', st_upcoming:'Upcoming', st_postponed:'Postponed',
             bracket_tbd:'Bracket populates once round-robin games are played 🏟️',
             semi_final:'Semi-Final', championship:'Championship',
@@ -969,17 +981,17 @@
             err_not_found:'⚠️ Game not found. Try refreshing the page.',
             err_save:'❌ Save failed. Check your connection and try again.',
             ann_saved:'✅ Banner updated!',
-            ann_default:'🍀 Welcome to the ACP Shamrock Classic! Celebrating ~50 years of softball in Pincourt — good luck to all teams! ⚾',
+            ann_default:'☀️ Welcome to the ACP Softball Classic — Summer Edition! 18 teams, 3 fields, one weekend. Good luck to all! ⚾',
         },
         fr: {
             tab_standings:'Classement', tab_bracket:'Tableau', tab_schedule:'Horaire', tab_info:'Info', tab_admin:'Admin',
-            hdr_dates:'28–31 mai',
+            hdr_dates:'20–23 août',
             lbl_progress:'Progression du tournoi', lbl_games:'matchs',
             lbl_playoff:'Éliminatoires (Top 4)', lbl_eliminated:'Éliminé',
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Équipe', col_gp:'MJ', col_w:'V', col_l:'D', col_t:'N', col_pts:'Pts',
             loading:'Chargement... ⚾', no_games:'Aucun match joué',
-            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', lbl_today:"Matchs du jour",
+            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', lbl_today:"Matchs du jour", park_fmt:'Parc {}', lbl_directions:'Itinéraire →', venues_title:'📍 Où nous jouons',
             st_final:'Final', st_live:'En direct', st_upcoming:'À venir', st_postponed:'Reporté',
             bracket_tbd:'Le tableau sera disponible après les matchs préliminaires 🏟️',
             semi_final:'Demi-finale', championship:'Finale',
@@ -1005,7 +1017,7 @@
             err_not_found:'⚠️ Match introuvable. Actualisez la page.',
             err_save:'❌ Échec de l\'enregistrement. Vérifiez votre connexion.',
             ann_saved:'✅ Bandeau mis à jour !',
-            ann_default:'🍀 Bienvenue au Classique Shamrock de l\'ACP ! Près de 50 ans de softball à Pincourt — bonne chance à toutes les équipes ! ⚾',
+            ann_default:'☀️ Bienvenue au Classique de softball de l\'ACP — Édition estivale ! 18 équipes, 3 terrains, une fin de semaine. Bonne chance à toutes ! ⚾',
         }
     };
     let lang  = localStorage.getItem('sc-lang')  || 'en';
@@ -1041,8 +1053,20 @@
     function makeDivBadge(div) {
         return div ? '<span class="div-badge div-' + div.toLowerCase() + '">' + div + '</span>' : '';
     }
+    // Maps link for a field. Settings key is MapsURL_<first word of the field name>,
+    // so "Shamrock 1" and "Shamrock 2" both use MapsURL_Shamrock, "Olympic" uses
+    // MapsURL_Olympic. Falls back to the general MapsURL when there's no specific one.
+    function venueURL(field) {
+        if (!field) return '';
+        const key = 'MapsURL_' + String(field).trim().split(/\s+/)[0];
+        return state.settings[key] || state.settings.MapsURL || '';
+    }
     function makeFieldBadge(field) {
-        return field ? '<span class="field-badge">📍 ' + field + '</span>' : '';
+        if (!field) return '';
+        const url = venueURL(field);
+        return url
+            ? '<a href="' + url + '" target="_blank" rel="noopener" class="field-badge field-badge-link">📍 ' + field + '</a>'
+            : '<span class="field-badge">📍 ' + field + '</span>';
     }
 
     // ==================== STATE ====================
@@ -1053,8 +1077,29 @@
     let weatherLoaded   = false;
     let weatherCache    = {}; // "YYYY-MM-DDTHH:00" -> {code, temp, precip}
 
-    // ==================== WEATHER HELPERS ====================
+    // ==================== TOURNAMENT DATE RANGE ====================
+    // Derived from the Games sheet — no hardcoded dates anywhere.
+    // Add a "Year" row to Settings to override; otherwise the current year is used.
     const MONTH_NUM = {January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',July:'07',August:'08',September:'09',October:'10',November:'11',December:'12'};
+    function tourneyYear() {
+        return String(parseInt(state.settings.Year) || new Date().getFullYear());
+    }
+    // "Thursday, August 20" -> "2026-08-20"  (null if unparseable)
+    function dayToISO(dayStr) {
+        try {
+            const p = String(dayStr).replace(',','').trim().split(/\s+/);
+            const mo = MONTH_NUM[p[1]];
+            if (!mo) return null;
+            return tourneyYear() + '-' + mo + '-' + String(parseInt(p[2])).padStart(2,'0');
+        } catch(e) { return null; }
+    }
+    // Earliest and latest game dates, as ISO strings
+    function tourneyRange() {
+        const iso = state.games.map(g => dayToISO(g.day)).filter(Boolean).sort();
+        return iso.length ? { start: iso[0], end: iso[iso.length-1] } : null;
+    }
+
+    // ==================== WEATHER HELPERS ====================
     function wmoIcon(c) {
         if (c === 0) return '☀️'; if (c <= 3) return '⛅'; if (c <= 48) return '🌫️';
         if (c <= 55) return '🌦️'; if (c <= 65) return '🌧️'; if (c <= 77) return '❄️';
@@ -1075,15 +1120,14 @@
     }
     function getGameWeatherKey(game) {
         try {
-            const p = game.day.replace(',','').trim().split(/\s+/);
-            const month = MONTH_NUM[p[1]];
-            const day   = String(parseInt(p[2])).padStart(2,'0');
-            const tp    = game.time.trim().split(/\s+/);
-            let h       = parseInt(tp[0].split(':')[0]);
-            const ampm  = (tp[1] || 'PM').toUpperCase();
+            const iso = dayToISO(game.day);
+            if (!iso) return null;
+            const tp   = game.time.trim().split(/\s+/);
+            let h      = parseInt(tp[0].split(':')[0]);
+            const ampm = (tp[1] || 'PM').toUpperCase();
             if (ampm === 'PM' && h !== 12) h += 12;
             if (ampm === 'AM' && h === 12) h  = 0;
-            return '2026-' + month + '-' + day + 'T' + String(h).padStart(2,'0') + ':00';
+            return iso + 'T' + String(h).padStart(2,'0') + ':00';
         } catch(e) { return null; }
     }
     function makeWxBadge(game) {
@@ -1100,11 +1144,13 @@
     }
     async function loadWeatherHourly() {
         try {
+            const range = tourneyRange();
+            if (!range) return;  // games not loaded yet — retried after loadState
             const url = 'https://api.open-meteo.com/v1/forecast'
                 + '?latitude=45.39&longitude=-74.01'
                 + '&hourly=weathercode,temperature_2m,precipitation_probability'
                 + '&timezone=America%2FNew_York'
-                + '&start_date=2026-05-28&end_date=2026-05-31';
+                + '&start_date=' + range.start + '&end_date=' + range.end;
             const res  = await fetch(url);
             const data = await res.json();
             if (data.hourly && data.hourly.time) {
@@ -1125,11 +1171,16 @@
         const el = document.getElementById('weather-body');
         el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);">' + t('forecast_loading') + '</div>';
         try {
+            const range = tourneyRange();
+            if (!range) {
+                el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);">' + t('forecast_na') + '</div>';
+                return;
+            }
             const url = 'https://api.open-meteo.com/v1/forecast'
                 + '?latitude=45.39&longitude=-74.01'
                 + '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max'
                 + '&timezone=America%2FNew_York'
-                + '&start_date=2026-05-28&end_date=2026-05-31';
+                + '&start_date=' + range.start + '&end_date=' + range.end;
             const res  = await fetch(url);
             const data = await res.json();
             if (!data.daily || !data.daily.time || !data.daily.time.length) {
@@ -1187,12 +1238,16 @@
     function updateHeader() {
         if (state.settings.TournamentName)
             document.getElementById('tournament-name').textContent = '⚾ ' + state.settings.TournamentName;
-        if (state.settings.Location && state.settings.Dates) {
+        if (state.settings.Location) {
             const loc = state.settings.MapsURL
                 ? '<a href="' + state.settings.MapsURL + '" target="_blank" class="location-link">📍 ' + state.settings.Location + '</a>'
                 : '📍 ' + state.settings.Location;
+            // Dates come from the Settings sheet (DatesFR for French); fall back to built-in text
+            const sheetDates = lang === 'fr'
+                ? (state.settings.DatesFR || state.settings.Dates)
+                : state.settings.Dates;
             document.getElementById('tournament-sub').innerHTML =
-                '<span class="live-dot"></span>' + loc + ' &nbsp;·&nbsp; <span id="hdr-dates">' + t('hdr_dates') + '</span>';
+                '<span class="live-dot"></span>' + loc + ' &nbsp;·&nbsp; <span id="hdr-dates">' + (sheetDates || t('hdr_dates')) + '</span>';
         }
     }
 
@@ -1337,7 +1392,7 @@
         const todayScroll  = document.getElementById('today-games-scroll');
         const todayLabel   = document.getElementById('today-games-label');
 
-        // Build today's date string in the same format GAS uses: "Thursday, May 28"
+        // Build today's date string in the same format GAS uses, e.g. "Saturday, August 22"
         const todayStr = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })
                                    .replace(/,\s*\d{4}$/, '');
 
@@ -1426,6 +1481,39 @@
                 banner.style.display = 'none';
             }
         }
+    }
+
+    // ==================== VENUES ====================
+    // Groups the fields in the schedule by park (first word of the field name) and
+    // gives each one its own directions link from Settings.
+    function renderVenues() {
+        const card = document.getElementById('venues-card');
+        if (!card) return;
+        const parks = {};
+        state.games.forEach(g => {
+            if (!g.field) return;
+            const park = String(g.field).trim().split(/\s+/)[0];
+            if (!parks[park]) parks[park] = { fields:new Set(), games:0 };
+            parks[park].fields.add(g.field);
+            parks[park].games++;
+        });
+        const names = Object.keys(parks).sort((a,b) => parks[b].games - parks[a].games);
+        if (!names.length) { card.style.display = 'none'; return; }
+        card.style.display = '';
+        card.innerHTML = names.map(park => {
+            const p    = parks[park];
+            const url  = state.settings['MapsURL_' + park] || '';
+            const fl   = Array.from(p.fields).sort();
+            const diamonds = fl.length > 1 ? fl.join(' · ') : fl[0];
+            const meta = diamonds + ' &nbsp;·&nbsp; ' + p.games + ' ' + t('lbl_games');
+            return '<div class="venue-row">'
+                + '<div class="venue-info">'
+                +   '<div class="venue-name">' + t('park_fmt').replace('{}', park) + '</div>'
+                +   '<div class="venue-meta">' + meta + '</div>'
+                + '</div>'
+                + (url ? '<a class="venue-go" href="' + url + '" target="_blank" rel="noopener">' + t('lbl_directions') + '</a>' : '')
+                + '</div>';
+        }).join('');
     }
 
     // ==================== BRACKET ====================
@@ -1795,7 +1883,7 @@
         const ids = {
             'hdr-dates':'hdr_dates', 'lbl-progress':'lbl_progress',
             'lbl-playoff':'lbl_playoff', 'lbl-div-b':'lbl_div_b', 'lbl-div-c':'lbl_div_c',
-            'lbl-forecast-title':'forecast_title', 'lbl-about-title':'about_title',
+            'lbl-venues-title':'venues_title', 'lbl-forecast-title':'forecast_title', 'lbl-about-title':'about_title',
             'lbl-format-title':'format_title', 'lbl-rules-title':'rules_title',
             'lbl-tb-title':'tb_title', 'lbl-wx-title':'wx_title',
             'lbl-admin-title':'admin_title', 'lbl-admin-prompt':'admin_prompt',
@@ -1839,14 +1927,15 @@
         renderStandings();
         renderBracket();
         renderSchedule();
+        renderVenues();
         if (state.adminUnlocked) populateGameSelect();
     }
 
     // ==================== INIT ====================
     applyTheme();
     applyLang();
-    loadState();
-    loadWeatherHourly(); // Load hourly weather silently for per-game badges
+    // Weather needs the game dates, so it kicks off once the first data load lands
+    loadState().then(loadWeatherHourly);
     setInterval(loadState, 15000);
 </script>
 </body>
