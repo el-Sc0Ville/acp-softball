@@ -269,6 +269,15 @@
         /* ============================================================
            SITE TRAFFIC (admin)
         ============================================================ */
+        .advance-row { display:flex; align-items:center; gap:10px; padding:9px 0;
+            border-bottom:1px solid color-mix(in srgb,var(--text) 6%,transparent); }
+        .advance-row:last-of-type { border-bottom:none; }
+        .advance-info { flex:1; min-width:0; }
+        .advance-title { font-size:0.7rem; font-weight:800; color:var(--text3);
+            text-transform:uppercase; letter-spacing:0.05em; }
+        .advance-teams { font-size:0.86rem; font-weight:700; color:var(--text); margin-top:2px; }
+        .advance-btn { flex-shrink:0; width:auto; padding:8px 14px; font-size:0.74rem; margin:0; }
+        .advance-note { margin-top:11px; font-size:0.7rem; line-height:1.5; color:var(--text3); }
         .visit-totals { display:flex; gap:8px; margin-bottom:14px; }
         .visit-total { flex:1; background:color-mix(in srgb,var(--text) 5%,transparent);
             border-radius:10px; padding:9px 4px; text-align:center; }
@@ -927,11 +936,11 @@
             <div class="footer-credit">
                 <div class="lang-en">
                     Proudly built by a <span class="telus-badge"><span class="telus-dot"></span>TELUS</span> team member<br>
-                    as part of the <strong style="color:var(--text2);">Days of Giving</strong> program 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-14</div>
+                    as part of the <strong style="color:var(--text2);">Days of Giving</strong> program 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-23</div>
                 </div>
                 <div class="lang-fr">
                     Fièrement conçu par un membre de l'équipe <span class="telus-badge"><span class="telus-dot"></span>TELUS</span><br>
-                    dans le cadre des <strong style="color:var(--text2);">Journées de Générosité</strong> 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-14</div>
+                    dans le cadre des <strong style="color:var(--text2);">Journées de Générosité</strong> 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-23</div>
                 </div>
             </div>
 
@@ -994,6 +1003,10 @@
                         <div class="success-toast" id="save-toast" data-key-text="save_success">✅ Score saved! Standings updated.</div>
                     </div>
                     <div id="admin-error" style="display:none;color:var(--red);font-size:0.78rem;font-weight:800;text-align:center;margin-top:10px;padding:10px;background:color-mix(in srgb,var(--red) 10%,transparent);border-radius:8px;border:1px solid color-mix(in srgb,var(--red) 30%,transparent);"></div>
+                </div>
+                <div class="admin-card" id="advance-card" style="display:none;">
+                    <h3>🏆 <span id="lbl-advance-title">Advance to Finals</span></h3>
+                    <div id="advance-body"></div>
                 </div>
                 <div class="admin-card">
                     <h3>📈 <span id="lbl-visits-title">Site Traffic</span></h3>
@@ -1073,7 +1086,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Team', col_gp:'GP', col_w:'W', col_l:'L', col_t:'T', col_pts:'Pts',
             loading:'Loading... ⚾', no_games:'No games played yet',
-            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', visits_total:'Total Visits', visits_today:'Today', visits_days:'Days Live', visits_none:'No visits recorded yet — the counter starts once the site is live.', visits_title:'📈 Site Traffic', donate_title:'💚 Support the Tournament', donate_blurb:'Every dollar goes straight back into ACP community projects in Pincourt. To chip in, send an Interac e-Transfer to:', donate_cta:'💚 Donate Now', donate_copy:'Copy', donate_copied:'✓ Copied!', donate_copyfail:'Copy failed', donate_s1:'Open your banking app and choose Interac e-Transfer.', donate_s2:'Paste the address above as the recipient.', donate_s3:'Enter any amount and send. Thank you! 💚', lbl_today:"Today's Games", lbl_not_started:'Standings appear once the first games are played', col_rec:'Record', col_diff:'Diff', lbl_their_games:'All Games', lbl_vs:'vs', lbl_at:'@', park_fmt:'{} Park', lbl_directions:'Directions →', venues_title:'📍 Where We Play',
+            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', advance_title:'🏆 Advance to Finals', advance_go:'Set Matchup', advance_note:'Only appears when both semi-finals in a division are Final. Writes just the two team names into the championship row — scores are never touched.', advance_confirm:'Set the Division {div} final to {a} vs {b}?', visits_total:'Total Visits', visits_today:'Today', visits_days:'Days Live', visits_none:'No visits recorded yet — the counter starts once the site is live.', visits_title:'📈 Site Traffic', donate_title:'💚 Support the Tournament', donate_blurb:'Every dollar goes straight back into ACP community projects in Pincourt. To chip in, send an Interac e-Transfer to:', donate_cta:'💚 Donate Now', donate_copy:'Copy', donate_copied:'✓ Copied!', donate_copyfail:'Copy failed', donate_s1:'Open your banking app and choose Interac e-Transfer.', donate_s2:'Paste the address above as the recipient.', donate_s3:'Enter any amount and send. Thank you! 💚', lbl_today:"Today's Games", lbl_not_started:'Standings appear once the first games are played', col_rec:'Record', col_diff:'Diff', lbl_their_games:'All Games', lbl_vs:'vs', lbl_at:'@', park_fmt:'{} Park', lbl_directions:'Directions →', venues_title:'📍 Where We Play',
             st_final:'Final', st_live:'Live', st_upcoming:'Upcoming', st_postponed:'Postponed',
             bracket_tbd:'Bracket populates once round-robin games are played 🏟️',
             semi_final:'Semi-Final', championship:'Championship',
@@ -1109,7 +1122,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Équipe', col_gp:'MJ', col_w:'V', col_l:'D', col_t:'N', col_pts:'Pts',
             loading:'Chargement... ⚾', no_games:'Aucun match joué',
-            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', visits_total:'Visites totales', visits_today:"Aujourd'hui", visits_days:'Jours en ligne', visits_none:'Aucune visite enregistrée — le compteur démarre dès la mise en ligne.', visits_title:'📈 Achalandage du site', donate_title:'💚 Soutenir le tournoi', donate_blurb:'Chaque dollar est réinvesti dans les projets communautaires de l\'ACP à Pincourt. Pour contribuer, envoyez un virement Interac à :', donate_cta:'💚 Faire un don', donate_copy:'Copier', donate_copied:'✓ Copié !', donate_copyfail:'Échec de la copie', donate_s1:'Ouvrez votre application bancaire et choisissez Virement Interac.', donate_s2:'Collez l\'adresse ci-dessus comme destinataire.', donate_s3:'Entrez le montant de votre choix et envoyez. Merci ! 💚', lbl_today:"Matchs du jour", lbl_not_started:'Le classement apparaîtra après les premiers matchs', col_rec:'Fiche', col_diff:'Diff', lbl_their_games:'Tous les matchs', lbl_vs:'c.', lbl_at:'@', park_fmt:'Parc {}', lbl_directions:'Itinéraire →', venues_title:'📍 Où nous jouons',
+            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', advance_title:'🏆 Passage à la finale', advance_go:'Définir', advance_note:'Apparaît seulement quand les deux demi-finales d\'une division sont finales. N\'inscrit que les deux équipes dans la ligne de la finale — les scores ne sont jamais modifiés.', advance_confirm:'Inscrire la finale de la division {div} : {a} contre {b} ?', visits_total:'Visites totales', visits_today:"Aujourd'hui", visits_days:'Jours en ligne', visits_none:'Aucune visite enregistrée — le compteur démarre dès la mise en ligne.', visits_title:'📈 Achalandage du site', donate_title:'💚 Soutenir le tournoi', donate_blurb:'Chaque dollar est réinvesti dans les projets communautaires de l\'ACP à Pincourt. Pour contribuer, envoyez un virement Interac à :', donate_cta:'💚 Faire un don', donate_copy:'Copier', donate_copied:'✓ Copié !', donate_copyfail:'Échec de la copie', donate_s1:'Ouvrez votre application bancaire et choisissez Virement Interac.', donate_s2:'Collez l\'adresse ci-dessus comme destinataire.', donate_s3:'Entrez le montant de votre choix et envoyez. Merci ! 💚', lbl_today:"Matchs du jour", lbl_not_started:'Le classement apparaîtra après les premiers matchs', col_rec:'Fiche', col_diff:'Diff', lbl_their_games:'Tous les matchs', lbl_vs:'c.', lbl_at:'@', park_fmt:'Parc {}', lbl_directions:'Itinéraire →', venues_title:'📍 Où nous jouons',
             st_final:'Final', st_live:'En direct', st_upcoming:'À venir', st_postponed:'Reporté',
             bracket_tbd:'Le tableau sera disponible après les matchs préliminaires 🏟️',
             semi_final:'Demi-finale', championship:'Finale',
@@ -1629,6 +1642,79 @@
         }
     }
 
+    // ==================== ADVANCE WINNERS TO FINALS ====================
+    // Works out who won each semi and offers a one-tap write of those two team IDs
+    // into the championship row. Read-only until the button is actually pressed.
+    function semiWinner(game) {
+        if (!game || game.status !== 'Final') return null;
+        if (!(game.home > 0 && game.away > 0)) return null;
+        const wid = game.homeScore > game.awayScore ? game.home
+                  : game.awayScore > game.homeScore ? game.away : null;   // a tie can't advance
+        return wid ? state.teams.find(tm => tm.id === wid) || null : null;
+    }
+    function pendingFinals() {
+        const out = [];
+        ['B','C'].forEach(div => {
+            const s1 = state.games.find(g => g.label === 'Semi-Final ' + div + ' (1v4)');
+            const s2 = state.games.find(g => g.label === 'Semi-Final ' + div + ' (2v3)');
+            const ch = state.games.find(g => g.label === 'Championship ' + div);
+            if (!ch) return;
+            const w1 = semiWinner(s1), w2 = semiWinner(s2);
+            if (!w1 || !w2) return;                               // semis not both finished
+            if (ch.home === w1.id && ch.away === w2.id) return;   // already set
+            out.push({ div, champ: ch, w1, w2 });
+        });
+        return out;
+    }
+    function renderAdvance() {
+        const card = document.getElementById('advance-card');
+        const body = document.getElementById('advance-body');
+        if (!card || !body) return;
+        const pend = pendingFinals();
+        if (!pend.length) { card.style.display = 'none'; return; }
+        card.style.display = '';
+        body.innerHTML = pend.map(p =>
+            '<div class="advance-row">'
+          +   '<div class="advance-info">'
+          +     '<div class="advance-title">' + t('championship') + ' ' + p.div + '</div>'
+          +     '<div class="advance-teams">' + p.w1.name + ' &nbsp;vs&nbsp; ' + p.w2.name + '</div>'
+          +   '</div>'
+          +   '<button class="btn btn-gold advance-btn" onclick="advanceFinal(\'' + p.div + '\')">'
+          +     t('advance_go') + '</button>'
+          + '</div>').join('')
+          + '<div class="advance-note">' + t('advance_note') + '</div>';
+    }
+    async function advanceFinal(div) {
+        const p = pendingFinals().find(x => x.div === div);
+        if (!p) return;
+        if (!confirm(t('advance_confirm')
+                     .replace('{div}', div)
+                     .replace('{a}', p.w1.name)
+                     .replace('{b}', p.w2.name))) return;
+        const btn = document.querySelector('.advance-btn');
+        if (btn) { btn.disabled = true; btn.textContent = t('saving'); }
+        try {
+            const fd = new FormData();
+            fd.append('type',   'setteams');
+            fd.append('gameId', p.champ.id);
+            fd.append('homeId', p.w1.id);
+            fd.append('awayId', p.w2.id);
+            const res    = await fetch(scriptURL, { method:'POST', body:fd });
+            const result = await res.json();
+            if (result.result === 'success') {
+                p.champ.home = p.w1.id;
+                p.champ.away = p.w2.id;
+                lastDataHash = null;
+                render();
+                await loadState();
+            } else {
+                showAdminError(t('err_save'));
+            }
+        } catch(e) {
+            showAdminError(t('err_save'));
+        }
+    }
+
     // ==================== VISIT COUNTER ====================
     // Fires once per browser session, not on every 15s poll, so the number means
     // "people who opened the app" rather than "requests made".
@@ -1996,23 +2082,24 @@
                 const sc        = isPlayed ? 'status-final' : isLive ? 'status-live' : g.status === 'Postponed' ? 'status-postponed' : 'status-upcoming';
                 const wxBadge   = makeWxBadge(g);
                 const stSpan    = '<span class="game-status ' + sc + '">' + getStatusLabel(g.status) + '</span>';
-                if (g.label) {
-                    html += '<div class="game-card' + (isLive ? ' game-live' : '') + '">'
-                        + '<div class="game-meta"><div class="game-time">' + formatTimeDisplay(g.time) + '</div>'
-                        + '<span class="game-label-text">' + g.label + '</span>'
-                        + makeDivBadge(g.division) + makeFieldBadge(g.field) + wxBadge + stSpan + '</div></div>';
-                } else {
-                    html += '<div class="game-card' + (isLive ? ' game-live' : '') + '">'
-                        + '<div class="game-meta"><div class="game-time">' + formatTimeDisplay(g.time) + '</div>'
-                        + makeDivBadge(g.division) + makeFieldBadge(g.field) + wxBadge + stSpan + '</div>'
-                        + '<div class="game-matchup-row">'
-                        + '<div class="team-a ' + (awayWin ? 'winner-bold' : '') + '">' + awayName + '</div>'
-                        + (isPlayed || isLive
-                            ? '<div class="score-center">' + g.awayScore + ' – ' + g.homeScore + '</div>'
-                            : '<span class="vs-badge">VS</span>')
-                        + '<div class="team-b ' + (homeWin ? 'winner-bold' : '') + '">' + homeName + '</div>'
-                        + '</div></div>';
-                }
+                // A labelled game (semi / final) still shows its matchup once the teams
+                // are known. Only fall back to a label-only card while they're still TBD.
+                const hasTeams  = g.home > 0 && g.away > 0;
+                const labelChip = g.label ? '<span class="game-label-text">' + g.label + '</span>' : '';
+                html += '<div class="game-card' + (isLive ? ' game-live' : '') + '">'
+                    + '<div class="game-meta"><div class="game-time">' + formatTimeDisplay(g.time) + '</div>'
+                    + labelChip
+                    + makeDivBadge(g.division) + makeFieldBadge(g.field) + wxBadge + stSpan + '</div>'
+                    + (hasTeams
+                        ? '<div class="game-matchup-row">'
+                          + '<div class="team-a ' + (awayWin ? 'winner-bold' : '') + '">' + awayName + '</div>'
+                          + (isPlayed || isLive
+                              ? '<div class="score-center">' + g.awayScore + ' – ' + g.homeScore + '</div>'
+                              : '<span class="vs-badge">VS</span>')
+                          + '<div class="team-b ' + (homeWin ? 'winner-bold' : '') + '">' + homeName + '</div>'
+                          + '</div>'
+                        : '')
+                    + '</div>';
             });
             html += '</div>';
         });
@@ -2043,7 +2130,13 @@
         sel.innerHTML = '<option value="">' + t('choose_game') + '</option>';
         state.games.forEach(g => {
             const prefix = g.division ? '[Div ' + g.division + '] ' : '';
-            const label  = g.label || (getTeamName(g.away) + ' vs ' + getTeamName(g.home));
+            // Show the matchup even on labelled playoff games, so whoever is entering
+            // scores can tell which game is which.
+            const matchup = (g.home > 0 && g.away > 0)
+                ? getTeamName(g.away) + ' vs ' + getTeamName(g.home) : '';
+            const label = g.label
+                ? g.label + (matchup ? ' · ' + matchup : ' · TBD')
+                : (matchup || 'TBD');
             sel.innerHTML += '<option value="' + g.id + '">' + prefix + formatDayDisplay(g.day) + ' ' + formatTimeDisplay(g.time) + ' — ' + label + '</option>';
         });
         if (currVal) sel.value = currVal;
@@ -2201,7 +2294,7 @@
         const ids = {
             'hdr-dates':'hdr_dates', 'lbl-progress':'lbl_progress',
             'lbl-playoff':'lbl_playoff', 'lbl-div-b':'lbl_div_b', 'lbl-div-c':'lbl_div_c',
-            'lbl-venues-title':'venues_title', 'lbl-donate-title':'donate_title', 'lbl-visits-title':'visits_title', 'lbl-forecast-title':'forecast_title', 'lbl-about-title':'about_title',
+            'lbl-venues-title':'venues_title', 'lbl-donate-title':'donate_title', 'lbl-visits-title':'visits_title', 'lbl-advance-title':'advance_title', 'lbl-forecast-title':'forecast_title', 'lbl-about-title':'about_title',
             'lbl-format-title':'format_title', 'lbl-rules-title':'rules_title',
             'lbl-tb-title':'tb_title', 'lbl-wx-title':'wx_title',
             'lbl-admin-title':'admin_title', 'lbl-admin-prompt':'admin_prompt',
@@ -2248,6 +2341,7 @@
         renderVenues();
         renderDonate();
         renderVisits();
+        renderAdvance();
         if (state.adminUnlocked) populateGameSelect();
     }
 
@@ -2257,7 +2351,7 @@
     // Weather needs the game dates, so it kicks off once the first data load lands
     loadState().then(() => { loadWeatherHourly(); pingVisit(); });
     setInterval(loadState, 15000);
-    console.log('%c ACP Softball Classic — build 2026-08-14 ','background:#4B178A;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700');
+    console.log('%c ACP Softball Classic — build 2026-08-23 ','background:#4B178A;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700');
 </script>
 </body>
 </html>
