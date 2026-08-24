@@ -278,6 +278,11 @@
         .advance-teams { font-size:0.86rem; font-weight:700; color:var(--text); margin-top:2px; }
         .advance-btn { flex-shrink:0; width:auto; padding:8px 14px; font-size:0.74rem; margin:0; }
         .advance-note { margin-top:11px; font-size:0.7rem; line-height:1.5; color:var(--text3); }
+        .ann-flag { display:inline-block; background:color-mix(in srgb,var(--accent) 16%,transparent);
+            color:var(--accent); font-size:0.56rem; font-weight:900; padding:2px 5px;
+            border-radius:3px; letter-spacing:0.06em; margin-right:3px; vertical-align:1px; }
+        .ann-flag-fr { background:color-mix(in srgb,var(--blue) 16%,transparent); color:var(--blue); }
+        .ann-hint { font-size:0.68rem; color:var(--text3); margin-top:5px; line-height:1.45; }
         .visit-totals { display:flex; gap:8px; margin-bottom:14px; }
         .visit-total { flex:1; background:color-mix(in srgb,var(--text) 5%,transparent);
             border-radius:10px; padding:9px 4px; text-align:center; }
@@ -1013,12 +1018,18 @@
                     <div id="visits-body"></div>
                 </div>
                 <div class="admin-card">
-                    <h3>📢 Announcement Banner</h3>
-                    <p style="font-size:0.8rem;color:var(--text2);margin-bottom:13px;">Message shown at the top of the app for all users. Leave blank to show the default welcome message.</p>
+                    <h3>📢 <span id="lbl-ann-title">Announcement Banner</span></h3>
+                    <p style="font-size:0.8rem;color:var(--text2);margin-bottom:13px;" id="lbl-ann-help">Message shown at the top of the app. Leave both blank to show the default welcome message.</p>
                     <div class="form-group">
-                        <label class="form-label">Message</label>
+                        <label class="form-label"><span class="ann-flag">EN</span> <span id="lbl-ann-en">English</span></label>
                         <textarea class="form-textarea" id="announcement-input" rows="3"
-                                  placeholder="e.g. ⚠️ Field 3 game at 2PM postponed — updates to follow"></textarea>
+                                  placeholder="e.g. ⚠️ 2PM game on Field 3 postponed — updates to follow"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><span class="ann-flag ann-flag-fr">FR</span> <span id="lbl-ann-fr">French</span></label>
+                        <textarea class="form-textarea" id="announcement-input-fr" rows="3"
+                                  placeholder="ex. ⚠️ Match de 14 h au terrain 3 reporté — suivez les mises à jour"></textarea>
+                        <div class="ann-hint" id="lbl-ann-hint">Leave blank and French users will see the English message.</div>
                     </div>
                     <button class="btn btn-gold" id="ann-save-btn" onclick="saveAnnouncement()">📢 Update Banner</button>
                     <div class="success-toast" id="ann-toast">✅ Banner updated!</div>
@@ -1086,7 +1097,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Team', col_gp:'GP', col_w:'W', col_l:'L', col_t:'T', col_pts:'Pts',
             loading:'Loading... ⚾', no_games:'No games played yet',
-            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', advance_title:'🏆 Advance to Finals', advance_go:'Set Matchup', advance_note:'Only appears when both semi-finals in a division are Final. Writes just the two team names into the championship row — scores are never touched.', advance_confirm:'Set the Division {div} final to {a} vs {b}?', visits_total:'Total Visits', visits_today:'Today', visits_days:'Days Live', visits_none:'No visits recorded yet — the counter starts once the site is live.', visits_title:'📈 Site Traffic', donate_title:'💚 Support the Tournament', donate_blurb:'Every dollar goes straight back into ACP community projects in Pincourt. To chip in, send an Interac e-Transfer to:', donate_cta:'💚 Donate Now', donate_copy:'Copy', donate_copied:'✓ Copied!', donate_copyfail:'Copy failed', donate_s1:'Open your banking app and choose Interac e-Transfer.', donate_s2:'Paste the address above as the recipient.', donate_s3:'Enter any amount and send. Thank you! 💚', lbl_today:"Today's Games", lbl_not_started:'Standings appear once the first games are played', col_rec:'Record', col_diff:'Diff', lbl_their_games:'All Games', lbl_vs:'vs', lbl_at:'@', park_fmt:'{} Park', lbl_directions:'Directions →', venues_title:'📍 Where We Play',
+            live_now:'🔴 Live Now', up_next:'⏭️ Up Next', advance_title:'🏆 Advance to Finals', advance_go:'Set Matchup', advance_note:'Only appears when both semi-finals in a division are Final. Writes just the two team names into the championship row — scores are never touched.', advance_confirm:'Set the Division {div} final to {a} vs {b}?', ann_title:'📢 Announcement Banner', ann_help:'Message shown at the top of the app. Leave both blank to show the default welcome message.', ann_en:'English', ann_fr:'French', ann_hint:'Leave blank and French users will see the English message.', visits_total:'Total Visits', visits_today:'Today', visits_days:'Days Live', visits_none:'No visits recorded yet — the counter starts once the site is live.', visits_title:'📈 Site Traffic', donate_title:'💚 Support the Tournament', donate_blurb:'Every dollar goes straight back into ACP community projects in Pincourt. To chip in, send an Interac e-Transfer to:', donate_cta:'💚 Donate Now', donate_copy:'Copy', donate_copied:'✓ Copied!', donate_copyfail:'Copy failed', donate_s1:'Open your banking app and choose Interac e-Transfer.', donate_s2:'Paste the address above as the recipient.', donate_s3:'Enter any amount and send. Thank you! 💚', lbl_today:"Today's Games", lbl_not_started:'Standings appear once the first games are played', col_rec:'Record', col_diff:'Diff', lbl_their_games:'All Games', lbl_vs:'vs', lbl_at:'@', park_fmt:'{} Park', lbl_directions:'Directions →', venues_title:'📍 Where We Play',
             st_final:'Final', st_live:'Live', st_upcoming:'Upcoming', st_postponed:'Postponed',
             bracket_tbd:'Bracket populates once round-robin games are played 🏟️',
             semi_final:'Semi-Final', championship:'Championship',
@@ -1122,7 +1133,7 @@
             lbl_div_b:'Division B', lbl_div_c:'Division C',
             col_team:'Équipe', col_gp:'MJ', col_w:'V', col_l:'D', col_t:'N', col_pts:'Pts',
             loading:'Chargement... ⚾', no_games:'Aucun match joué',
-            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', advance_title:'🏆 Passage à la finale', advance_go:'Définir', advance_note:'Apparaît seulement quand les deux demi-finales d\'une division sont finales. N\'inscrit que les deux équipes dans la ligne de la finale — les scores ne sont jamais modifiés.', advance_confirm:'Inscrire la finale de la division {div} : {a} contre {b} ?', visits_total:'Visites totales', visits_today:"Aujourd'hui", visits_days:'Jours en ligne', visits_none:'Aucune visite enregistrée — le compteur démarre dès la mise en ligne.', visits_title:'📈 Achalandage du site', donate_title:'💚 Soutenir le tournoi', donate_blurb:'Chaque dollar est réinvesti dans les projets communautaires de l\'ACP à Pincourt. Pour contribuer, envoyez un virement Interac à :', donate_cta:'💚 Faire un don', donate_copy:'Copier', donate_copied:'✓ Copié !', donate_copyfail:'Échec de la copie', donate_s1:'Ouvrez votre application bancaire et choisissez Virement Interac.', donate_s2:'Collez l\'adresse ci-dessus comme destinataire.', donate_s3:'Entrez le montant de votre choix et envoyez. Merci ! 💚', lbl_today:"Matchs du jour", lbl_not_started:'Le classement apparaîtra après les premiers matchs', col_rec:'Fiche', col_diff:'Diff', lbl_their_games:'Tous les matchs', lbl_vs:'c.', lbl_at:'@', park_fmt:'Parc {}', lbl_directions:'Itinéraire →', venues_title:'📍 Où nous jouons',
+            live_now:'🔴 En direct', up_next:'⏭️ Prochain match', advance_title:'🏆 Passage à la finale', advance_go:'Définir', advance_note:'Apparaît seulement quand les deux demi-finales d\'une division sont finales. N\'inscrit que les deux équipes dans la ligne de la finale — les scores ne sont jamais modifiés.', advance_confirm:'Inscrire la finale de la division {div} : {a} contre {b} ?', ann_title:'📢 Bandeau d\'annonce', ann_help:'Message affiché en haut de l\'application. Laissez les deux vides pour afficher le message d\'accueil par défaut.', ann_en:'Anglais', ann_fr:'Français', ann_hint:'Laissez vide et les utilisateurs francophones verront le message anglais.', visits_total:'Visites totales', visits_today:"Aujourd'hui", visits_days:'Jours en ligne', visits_none:'Aucune visite enregistrée — le compteur démarre dès la mise en ligne.', visits_title:'📈 Achalandage du site', donate_title:'💚 Soutenir le tournoi', donate_blurb:'Chaque dollar est réinvesti dans les projets communautaires de l\'ACP à Pincourt. Pour contribuer, envoyez un virement Interac à :', donate_cta:'💚 Faire un don', donate_copy:'Copier', donate_copied:'✓ Copié !', donate_copyfail:'Échec de la copie', donate_s1:'Ouvrez votre application bancaire et choisissez Virement Interac.', donate_s2:'Collez l\'adresse ci-dessus comme destinataire.', donate_s3:'Entrez le montant de votre choix et envoyez. Merci ! 💚', lbl_today:"Matchs du jour", lbl_not_started:'Le classement apparaîtra après les premiers matchs', col_rec:'Fiche', col_diff:'Diff', lbl_their_games:'Tous les matchs', lbl_vs:'c.', lbl_at:'@', park_fmt:'Parc {}', lbl_directions:'Itinéraire →', venues_title:'📍 Où nous jouons',
             st_final:'Final', st_live:'En direct', st_upcoming:'À venir', st_postponed:'Reporté',
             bracket_tbd:'Le tableau sera disponible après les matchs préliminaires 🏟️',
             semi_final:'Demi-finale', championship:'Finale',
@@ -2117,6 +2128,8 @@
                 populateGameSelect();
                 const annInput = document.getElementById('announcement-input');
                 if (annInput) annInput.value = (state.settings.Announcement || '').trim();
+                const annInputFR = document.getElementById('announcement-input-fr');
+                if (annInputFR) annInputFR.value = (state.settings.AnnouncementFR || '').trim();
             } else {
                 document.getElementById('pin-error').style.display = 'block';
                 document.getElementById('pin-input').value = '';
@@ -2146,8 +2159,10 @@
         const game = state.games.find(g => g.id === id);
         if (!game) { document.getElementById('score-entry').style.display = 'none'; return; }
         document.getElementById('score-entry').style.display   = 'block';
-        document.getElementById('away-team-label').textContent = game.label ? t('team_a') : getTeamName(game.away);
-        document.getElementById('home-team-label').textContent = game.label ? t('team_b') : getTeamName(game.home);
+        // Show the real team name whenever it's known — including on semis and finals.
+        // The generic "Team A / Team B" is only for rows still waiting on a matchup.
+        document.getElementById('away-team-label').textContent = game.away > 0 ? getTeamName(game.away) : t('team_a');
+        document.getElementById('home-team-label').textContent = game.home > 0 ? getTeamName(game.home) : t('team_b');
         document.getElementById('away-score-input').value = game.awayScore !== undefined ? game.awayScore : '';
         document.getElementById('home-score-input').value = game.homeScore !== undefined ? game.homeScore : '';
         selectedStatus = game.status === 'Upcoming' ? 'Final' : game.status;
@@ -2208,12 +2223,18 @@
     function renderAnnouncement() {
         const bar    = document.getElementById('announcement-bar');
         const textEl = document.getElementById('announcement-text');
-        const msg    = (state.settings.Announcement || '').trim();
-        // If the admin pushed a new message, clear any previous dismiss so it re-appears
-        const prevMsg = sessionStorage.getItem('ann-last-msg') || '';
-        if (msg !== prevMsg) {
+        const en     = (state.settings.Announcement   || '').trim();
+        const fr     = (state.settings.AnnouncementFR || '').trim();
+        // French falls back to the English message when no FR text has been set
+        const msg    = lang === 'fr' ? (fr || en) : en;
+        // Dismiss is tracked against BOTH messages, so simply toggling language
+        // doesn't resurrect a banner the user already dismissed — but editing
+        // either version does bring it back for everyone.
+        const identity = en + '␟' + fr;
+        const prevId   = sessionStorage.getItem('ann-last-msg') || '';
+        if (identity !== prevId) {
             sessionStorage.removeItem('ann-dismissed');
-            sessionStorage.setItem('ann-last-msg', msg);
+            sessionStorage.setItem('ann-last-msg', identity);
         }
         if (sessionStorage.getItem('ann-dismissed')) { bar.style.display = 'none'; return; }
         textEl.textContent = msg || t('ann_default');
@@ -2224,7 +2245,8 @@
         sessionStorage.setItem('ann-dismissed', '1');
     }
     async function saveAnnouncement() {
-        const msg  = (document.getElementById('announcement-input').value || '').trim();
+        const msg   = (document.getElementById('announcement-input').value || '').trim();
+        const msgFR = (document.getElementById('announcement-input-fr').value || '').trim();
         const btn  = document.getElementById('ann-save-btn');
         const toast = document.getElementById('ann-toast');
         btn.disabled = true; btn.textContent = t('saving');
@@ -2232,13 +2254,15 @@
             const fd = new FormData();
             fd.append('type', 'announcement');
             fd.append('message', msg);
+            fd.append('messageFR', msgFR);
             const res    = await fetch(scriptURL, { method:'POST', body:fd });
             const result = await res.json();
             if (result.result === 'success') {
-                state.settings.Announcement = msg;
+                state.settings.Announcement   = msg;
+                state.settings.AnnouncementFR = msgFR;
                 lastDataHash = null;
                 sessionStorage.removeItem('ann-dismissed');
-                sessionStorage.setItem('ann-last-msg', msg);
+                sessionStorage.setItem('ann-last-msg', msg + '␟' + msgFR);
                 renderAnnouncement();
                 toast.textContent = t('ann_saved');
                 toast.style.display = 'block';
@@ -2294,7 +2318,7 @@
         const ids = {
             'hdr-dates':'hdr_dates', 'lbl-progress':'lbl_progress',
             'lbl-playoff':'lbl_playoff', 'lbl-div-b':'lbl_div_b', 'lbl-div-c':'lbl_div_c',
-            'lbl-venues-title':'venues_title', 'lbl-donate-title':'donate_title', 'lbl-visits-title':'visits_title', 'lbl-advance-title':'advance_title', 'lbl-forecast-title':'forecast_title', 'lbl-about-title':'about_title',
+            'lbl-venues-title':'venues_title', 'lbl-donate-title':'donate_title', 'lbl-visits-title':'visits_title', 'lbl-ann-title':'ann_title', 'lbl-ann-help':'ann_help', 'lbl-ann-en':'ann_en', 'lbl-ann-fr':'ann_fr', 'lbl-ann-hint':'ann_hint', 'lbl-advance-title':'advance_title', 'lbl-forecast-title':'forecast_title', 'lbl-about-title':'about_title',
             'lbl-format-title':'format_title', 'lbl-rules-title':'rules_title',
             'lbl-tb-title':'tb_title', 'lbl-wx-title':'wx_title',
             'lbl-admin-title':'admin_title', 'lbl-admin-prompt':'admin_prompt',
