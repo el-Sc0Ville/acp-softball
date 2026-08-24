@@ -69,7 +69,11 @@
         /* ============================================================
            APP SHELL
         ============================================================ */
-        .app { display:flex; flex-direction:column; height:100%; height:100dvh; overflow:hidden; }
+        /* Height comes from --app-h, which JS measures off visualViewport — the only
+           value iOS Chrome reports honestly once its toolbars are in play. The dvh /
+           % values are fallbacks for browsers where the variable never gets set. */
+        .app { display:flex; flex-direction:column; height:100%; height:100dvh;
+               height:var(--app-h, 100dvh); overflow:hidden; }
 
         /* ============================================================
            HEADER
@@ -77,6 +81,7 @@
         .app-header {
             position: sticky;
             top: 0;
+            flex-shrink: 0;
             z-index: 100;
             background: var(--glass);
             backdrop-filter: blur(20px);
@@ -230,9 +235,13 @@
             background:var(--bg); border-top-left-radius:20px; border-top-right-radius:20px;
             border-top:1px solid var(--border); box-shadow:0 -8px 40px var(--shadow);
             max-height:82vh; display:flex; flex-direction:column;
-            transform:translateY(101%); transition:transform 0.28s cubic-bezier(.32,.72,0,1);
+            transform:translateY(101%); visibility:hidden;
+            transition:transform 0.28s cubic-bezier(.32,.72,0,1), visibility 0s linear 0.28s;
             padding-bottom:env(safe-area-inset-bottom,0); }
-        .team-sheet.open { transform:translateY(0); }
+        /* visibility:hidden while closed — a fixed panel parked below the fold can
+           otherwise add to the pannable area on iOS. */
+        .team-sheet.open { transform:translateY(0); visibility:visible;
+            transition:transform 0.28s cubic-bezier(.32,.72,0,1), visibility 0s linear 0s; }
         .sheet-grip { width:38px; height:4px; border-radius:2px; background:var(--text3);
             opacity:0.4; margin:9px auto 4px; flex-shrink:0; }
         .sheet-head { padding:8px 18px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -941,11 +950,11 @@
             <div class="footer-credit">
                 <div class="lang-en">
                     Proudly built by a <span class="telus-badge"><span class="telus-dot"></span>TELUS</span> team member<br>
-                    as part of the <strong style="color:var(--text2);">Days of Giving</strong> program 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-23</div>
+                    as part of the <strong style="color:var(--text2);">Days of Giving</strong> program 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-24</div>
                 </div>
                 <div class="lang-fr">
                     Fièrement conçu par un membre de l'équipe <span class="telus-badge"><span class="telus-dot"></span>TELUS</span><br>
-                    dans le cadre des <strong style="color:var(--text2);">Journées de Générosité</strong> 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-23</div>
+                    dans le cadre des <strong style="color:var(--text2);">Journées de Générosité</strong> 💚<div style="margin-top:8px;font-size:0.62rem;color:var(--text3);opacity:0.75;">build 2026-08-24</div>
                 </div>
             </div>
 
@@ -2369,13 +2378,34 @@
         if (state.adminUnlocked) populateGameSelect();
     }
 
+    // ==================== VIEWPORT HEIGHT ====================
+    // iOS Chrome reports 100dvh as the height *without* its toolbars, so a layout
+    // sized to it ends up taller than what you can actually see and the whole page
+    // becomes pannable. visualViewport.height is the real visible height, so we
+    // measure it and drive the shell from a CSS variable instead.
+    function setAppHeight() {
+        const vv = window.visualViewport;
+        const h  = Math.round(vv ? vv.height : window.innerHeight);
+        if (h > 0) document.documentElement.style.setProperty('--app-h', h + 'px');
+        // Nothing outside .app should ever scroll; snap back if the browser panned us.
+        if (window.scrollY !== 0) window.scrollTo(0, 0);
+    }
+    setAppHeight();
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', setAppHeight);
+        window.visualViewport.addEventListener('scroll', setAppHeight);
+    }
+    window.addEventListener('resize', setAppHeight);
+    window.addEventListener('orientationchange', () => setTimeout(setAppHeight, 300));
+    window.addEventListener('pageshow', setAppHeight);
+
     // ==================== INIT ====================
     applyTheme();
     applyLang();
     // Weather needs the game dates, so it kicks off once the first data load lands
     loadState().then(() => { loadWeatherHourly(); pingVisit(); });
     setInterval(loadState, 15000);
-    console.log('%c ACP Softball Classic — build 2026-08-23 ','background:#4B178A;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700');
+    console.log('%c ACP Softball Classic — build 2026-08-24 ','background:#4B178A;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700');
 </script>
 </body>
 </html>
